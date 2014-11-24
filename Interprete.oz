@@ -39,20 +39,13 @@ fun {Interprete Partition}
 	 end % local
       end % FlattenSuiteDePartition
 
-      Tune = [b b c d d c b a g g a b]
-      End1 = [etirer(facteur:1.5 b) etirer(facteur:0.5 a) etirer(facteur:2.0 a)]
-      End2 = [etirer(facteur:1.5 a) etirer(facteur:0.5 g) etirer(facteur:2.0 g)]
-      Interlude = [a a b g a etirer(facteur:0.5 [b c#5])
-		   b g a etirer(facteur:0.5 [b c#5])
-		   b a g a etirer(facteur:2.0 d) ]
-
-      FlattenedList
+      FlattenedPartition
+      
    in
-      FlattenedList = {FlattenPartition [Tune End1 Tune End2 Interlude Tune End2]}
+      FlattenedPartition = {FlattenPartition Partition}
+      FlattenedPartition
 
-      5
-
-      % ton code ici
+% ton code ici
  
       
    end % local
@@ -60,5 +53,21 @@ fun {Interprete Partition}
    
 end % Interprete
 
-declare
-V = {Interprete 4}
+
+
+local
+   Tune = [b b c d d c b a g g a b]
+   End1 = [etirer(facteur:1.5 b) etirer(facteur:0.5 a) etirer(facteur:2.0 a)]
+   End2 = [etirer(facteur:1.5 a) etirer(facteur:0.5 g) etirer(facteur:2.0 g)]
+   Interlude = [a a b g a etirer(facteur:0.5 [b c#5])
+		b g a etirer(facteur:0.5 [b c#5])
+		b a g a etirer(facteur:2.0 d) ]
+   
+   Result
+in
+   Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
+   {Browse Result}
+end
+
+
+   
