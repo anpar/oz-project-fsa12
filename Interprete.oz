@@ -1,56 +1,68 @@
 declare
 fun {Interprete Partition}
    local
-      fun {FlattenPartition L}
-	 local
-	    fun{Append Xs Ys}
-	       case Xs
-	       of nil then Ys
-	       [] H|T then H|{Append T Ys} 
-	       end
-	    end
-	    
-	 in 
-	    
-	    case L 
-	    of nil then nil
-	    [] H|T then {Append {FlattenPartition H} {FlattenSuiteDePartition T}}
-	    else [L]
-	    end
-	 end % local
+      fun {FlattenPartition L}  
+	 case L 
+	 of nil then nil
+	 [] H|T then {Append {FlattenPartition H} {FlattenPartition T}}
+	 else [L]
+	 end
       end % FlattenPartition
 
-      fun {FlattenSuiteDePartition L}
-	 local
-	    fun{Append Xs Ys}
-	       case Xs
-	       of nil then Ys
-	       [] H|T then H|{Append T Ys} 
-	       end
+      fun {ToNote Note}
+	 case Note
+	 of Nom#Octave then note(nom:Nom octave:Octave alteration:’#’)
+	 [] Atom then
+	    case {AtomToString Atom}
+	    of [N] then note(nom:Atom octave:4 alteration:none)
+	    [] [N O] then note(nom:{StringToAtom [N]}
+			       octave:{StringToInt [O]}
+			       alteration:none)
 	    end
-	    
-	 in 
-	    
-	    case L 
-	    of nil then nil
-	    [] H|T then {Append {FlattenPartition H} {FlattenSuiteDePartition T}}
-	    else [L]
-	    end
-	 end % local
-      end % FlattenSuiteDePartition
+	 end
+      end
+      
+      fun {VoiceConverter Part Acc}
+	 local TheVoice= echantillon(hauteur:Haut duree:Duree instrument:none) in
+	    Duree=1
+	    case Part of nil then Acc
+	    []  H|T then
+	       case H of muet(P) then skip
+	       [] duree(secondes:S P) then skip
+	       [] etirer(facteur:F P) then skip
+	       [] bourdon(note:N P) then skip
+	       [] transpose(demitons:DT P) then skip
+	       else
+		  local Z in
+		     case H
+		     of silence then skip%{VoiceConverter T {Append Acc }}
+		     else
+			Z = {ToNote H}
+		  
+		     end
+		  end % local
+	       end %case
+	    end%case
+	 end%local
+      end %VoiceConverter
+
+      fun {NumberDemiTons Note}
+	 Note
+      end
+      
+      
 
       FlattenedPartition
       
    in
       FlattenedPartition = {FlattenPartition Partition}
-      FlattenedPartition
+      {VoiceConverter FlattenedPartition nil}
 
-% ton code ici
- 
+      
+      
+      
       
    end % local
-   
-   
 end % Interprete
 
 
@@ -70,4 +82,4 @@ in
 end
 
 
-   
+
