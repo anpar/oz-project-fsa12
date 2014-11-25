@@ -8,5 +8,10 @@ A faire :
     * Flatten : done
     * VoiceConverter
     * NumberOrSemitones : done
+    * muet : done
+    * duree
+    * etirer : done
+    * bourdon
+    * transpose
 * Fonctions Mix
 * Extensions
