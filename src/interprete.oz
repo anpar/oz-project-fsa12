@@ -42,7 +42,7 @@ fun {Interprete Partition}
 	 end 
       end 
 
-      % Compiute the duration of an echantillon
+      % Compute the duration of an echantillon
       fun {DureeEchantillon ListEchantillon}
 	 local DureeEchantillonAux in
 	    fun {DureeEchantillonAux List Acc}
