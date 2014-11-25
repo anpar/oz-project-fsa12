@@ -11,7 +11,7 @@ fun {Interprete Partition}
 
       fun {ToNote Note}
 	 case Note
-	 of Nom#Octave then note(nom:Nom octave:Octave alteration:’#’)
+	 of Nom#Octave then note(nom:Nom octave:Octave alteration:'#')
 	 [] Atom then
 	    case {AtomToString Atom}
 	    of [N] then note(nom:Atom octave:4 alteration:none)
@@ -23,22 +23,25 @@ fun {Interprete Partition}
       end
       
       fun {VoiceConverter Part Acc}
-	 local TheVoice= echantillon(hauteur:Haut duree:Duree instrument:none) in
+	 local
+	    Haut Duree
+	    TheVoice= echantillon(hauteur:Haut duree:Duree instrument:none)
+	 in
 	    Duree=1
 	    case Part of nil then Acc
 	    []  H|T then
-	       case H of muet(P) then skip
-	       [] duree(secondes:S P) then skip
-	       [] etirer(facteur:F P) then skip
-	       [] bourdon(note:N P) then skip
-	       [] transpose(demitons:DT P) then skip
+	       case H of muet(P) then 1
+	       [] duree(secondes:S P) then 1
+	       [] etirer(facteur:F P) then 1
+	       [] bourdon(note:N P) then 1
+	       [] transpose(demitons:DT P) then 1
 	       else
 		  local Z in
 		     case H
-		     of silence then skip%{VoiceConverter T {Append Acc }}
+		     of silence then 1%{VoiceConverter T {Append Acc }}
 		     else
 			Z = {ToNote H}
-		  
+			1
 		     end
 		  end % local
 	       end %case
