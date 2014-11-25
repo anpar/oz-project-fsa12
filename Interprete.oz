@@ -21,37 +21,74 @@ fun {Interprete Partition}
 	    end
 	 end
       end
+
+
+      proc {Muet Partition Duree}
+	 local FPart in
+	    FPart = {FlattenPartition Partition}
+	    Duree = {DureeEchantillon {VoiceConverter FPart nil}}
+	 end %local
+      end %Muet
+      
+
+      fun {DureeEchantillon ListEchantillon}
+	 local DureeEchantillonAux in
+	    fun {DureeEchantillonAux List Acc}
+	       case List of nil then Acc
+	       []H|T then  {DureeEchantillonAux T (Acc+H.duree)}
+	       end %case	  
+	    end %DureeEchantillonAux
+	    {DureeEchantillonAux ListEchantillon 0}
+	 end %local
+      end %DureeEchantillon
+      
       
       fun {VoiceConverter Part Acc}
 	 local
-	    Haut Duree
-	    TheVoice= echantillon(hauteur:Haut duree:Duree instrument:none)
+	    Hauteur Duree 
+	    TheVoice
 	 in
-	    Duree=1
 	    case Part of nil then Acc
 	    []  H|T then
-	       case H of muet(P) then 1
-	       [] duree(secondes:S P) then 1
-	       [] etirer(facteur:F P) then 1
-	       [] bourdon(note:N P) then 1
-	       [] transpose(demitons:DT P) then 1
-	       else
-		  local Z in
-		     case H
-		     of silence then 1%{VoiceConverter T {Append Acc }}
-		     else
-			Z = {ToNote H}
-			1
-		     end
-		  end % local
+	       case H
+	       of muet(P) then
+		  TheVoice=silence(duree:Duree)
+		  {Muet P Duree}
+		  
+	       [] duree(secondes:S P) then
+		  	    TheVoice= echantillon(hauteur:Hauteur duree:Duree instrument:none)
+
+	       [] etirer(facteur:F P) then skip
+	       [] bourdon(note:N P) then skip
+	       [] transpose(demitons:DT P) then skip
+	       [] silence  then  TheVoice=silence(duree:1)
+	       else 
+		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
+		  Hauteur={NumberDemiTons 3}
+		     
 	       end %case
-	    end%case
+	       %{Browse 'ICI'}
+	       %{Browse {Append Acc [TheVoice]}}
+	       {VoiceConverter T {Append Acc TheVoice}}
+	    end%case   	    
 	 end%local
       end %VoiceConverter
 
       fun {NumberDemiTons Note}
-	 Note
+	 3
       end
+
+      fun {NumberOfNote Partition}
+	 local NumberOfNoteAux in
+	    fun {NumberOfNoteAux P Acc}
+	       case P of nil then Acc
+	       []H|T then {NumberOfNoteAux T Acc+1}
+	       end
+	    end
+	    {NumberOfNoteAux Partition 0}
+	 end
+      end
+      
       
       
 
@@ -60,9 +97,7 @@ fun {Interprete Partition}
    in
       FlattenedPartition = {FlattenPartition Partition}
       {VoiceConverter FlattenedPartition nil}
-
-      
-      
+  
       
       
    end % local
@@ -80,9 +115,8 @@ local
    
    Result
 in
-   Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
+   Result = {Interprete [a b]}
+   %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
+
    {Browse Result}
 end
-
-
-
