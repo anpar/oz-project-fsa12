@@ -1,14 +1,8 @@
 declare
 fun {Interprete Partition}
    local
-      fun {FlattenPartition L}  
-	 case L 
-	 of nil then nil
-	 [] H|T then {Append {FlattenPartition H} {FlattenPartition T}}
-	 else [L]
-	 end
-      end % FlattenPartition
-
+      % Transform a note in the extended format
+      % Nom | Nom#Octave | NomOctave -> note(nom:Nom octave:Octave alteration:'#'|none)
       fun {ToNote Note}
 	 case Note
 	 of Nom#Octave then note(nom:Nom octave:Octave alteration:'#')
@@ -22,14 +16,15 @@ fun {Interprete Partition}
 	 end
       end
 
-
+      % Transform a partition with the muet transformation
       proc {Muet Partition Duree}
 	 local FlatPart in
 	    FlatPart = {Flatten Partition}
 	    Duree = {DureeEchantillon {VoiceConverter FlatPart nil}}
-	 end %local
-      end %Muet
+	 end 
+      end 
 
+      % Transform a parition with the etirer transformation
       fun {Etirer Facteur Part}
 	 local Voice EtirerAux in
 	    fun {EtirerAux V}
@@ -39,28 +34,27 @@ fun {Interprete Partition}
 		  else echantillon(hauteur:E.hauteur
 				   duree:(E.duree*Facteur)
 				   instrument:E.instrument)|{EtirerAux T}
-		  end %case
-	       end %case
-	    end %EtirerAux
+		  end 
+	       end 
+	    end 
 	    Voice = {VoiceConverter {Flatten Part} nil}
-	    {EtirerAux Voice}
-	     
-	 end %local
-      end %Etirer
-      
+	    {EtirerAux Voice} 
+	 end 
+      end 
 
+      % Compiute the duration of an echantillon
       fun {DureeEchantillon ListEchantillon}
 	 local DureeEchantillonAux in
 	    fun {DureeEchantillonAux List Acc}
 	       case List of nil then Acc
 	       []H|T then  {DureeEchantillonAux T (Acc+H.duree)}
-	       end %case	  
-	    end %DureeEchantillonAux
+	       end 	  
+	    end 
 	    {DureeEchantillonAux ListEchantillon 0}
-	 end %local
-      end %DureeEchantillon
+	 end 
+      end 
       
-      
+      % Convert a partition to a voice, which is a list of echantillon
       fun {VoiceConverter Part Acc}
 	 local
 	    Hauteur Duree 
@@ -84,13 +78,11 @@ fun {Interprete Partition}
 	       else 
 		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
 		  Hauteur={NumberOfSemiTones {ToNote H}}
-		     
-	       end %case
-
+	       end 
 	       {VoiceConverter T {Append Acc {Flatten [TheVoice]}}}
-	    end%case   	    
-	 end%local
-      end %VoiceConverter
+	    end 	    
+	 end
+      end 
 
       % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
       fun {NumberOfSemiTones Note}
@@ -121,6 +113,7 @@ fun {Interprete Partition}
 	 end
       end
 
+      % Compute the number of note in a partition
       fun {NumberOfNote Partition}
 	 local NumberOfNoteAux in
 	    fun {NumberOfNoteAux P Acc}
@@ -131,23 +124,14 @@ fun {Interprete Partition}
 	    {NumberOfNoteAux Partition 0}
 	 end
       end
-      
-      
-      
-
       FlattenedPartition
-      
    in
       FlattenedPartition = {Flatten Partition}
       {VoiceConverter FlattenedPartition nil}
-  
-      
-      
-   end % local
-end % Interprete
+   end 
+end 
 
-
-
+% TEST ZONE
 local
    Tune = [b b c d d c b a g g a b]
    End1 = [etirer(facteur:1.5 b) etirer(facteur:0.5 a) etirer(facteur:2.0 a)]
@@ -155,15 +139,10 @@ local
    Interlude = [a a b g a etirer(facteur:0.5 [b c#5])
 		b g a etirer(facteur:0.5 [b c#5])
 		b a g a etirer(facteur:2.0 d) ]
-   
    Result
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
    Result = {Interprete [etirer(facteur:3 [a b e1 silence])]}
-
-   
    {Browse Result}
 end
-
-
