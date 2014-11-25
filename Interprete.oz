@@ -83,7 +83,7 @@ fun {Interprete Partition}
 	       [] silence  then  TheVoice=silence(duree:1)
 	       else 
 		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
-		  Hauteur={NumberDemiTons 3}
+		  Hauteur={NumberOfSemiTones {ToNote H}}
 		     
 	       end %case
 
@@ -92,8 +92,33 @@ fun {Interprete Partition}
 	 end%local
       end %VoiceConverter
 
-      fun {NumberDemiTons Note}
-	 3
+      % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
+      fun {NumberOfSemiTones Note}
+	 local
+	    ReferenceNote = note(nom:a octave:4 alteration:none) 
+	    DeltaOctave = Note.octave - ReferenceNote.octave
+	    NoteNumber = {AtomToString (Note.nom)}.1
+	    ReferenceNoteNumber = {AtomToString (ReferenceNote.nom)}.1
+	    DeltaNote = NoteNumber - ReferenceNoteNumber -1
+	    Correction1
+	    Correction2
+	 in
+	    if NoteNumber >= 99 then
+	       Correction1 = 1
+	    elseif NoteNumber >= 102 then
+	       Correction1 = 2
+	    else
+	       Correction1 = 0
+	    end
+	      
+	    if Note.alteration == '#' then
+	       Correction2 = 1
+	    else
+	       Correction2 = 0
+	    end
+
+	    12*DeltaOctave - 2*DeltaNote + Correction1 + Correction2
+	 end
       end
 
       fun {NumberOfNote Partition}
@@ -135,7 +160,7 @@ local
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
-   Result = {Interprete [etirer(facteur:3 [a b silence])]}
+   Result = {Interprete [etirer(facteur:3 [a b e1 silence])]}
 
    
    {Browse Result}
