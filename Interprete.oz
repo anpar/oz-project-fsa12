@@ -24,11 +24,29 @@ fun {Interprete Partition}
 
 
       proc {Muet Partition Duree}
-	 local FPart in
-	    FPart = {FlattenPartition Partition}
-	    Duree = {DureeEchantillon {VoiceConverter FPart nil}}
+	 local FlatPart in
+	    FlatPart = {Flatten Partition}
+	    Duree = {DureeEchantillon {VoiceConverter FlatPart nil}}
 	 end %local
       end %Muet
+
+      fun {Etirer Facteur Part}
+	 local Voice EtirerAux in
+	    fun {EtirerAux V}
+	       case V of nil then nil
+	       [] E|T then
+		  case E of silence(duree:D) then silence(duree:Facteur*D)|{EtirerAux T}
+		  else echantillon(hauteur:E.hauteur
+				   duree:(E.duree*Facteur)
+				   instrument:E.instrument)|{EtirerAux T}
+		  end %case
+	       end %case
+	    end %EtirerAux
+	    Voice = {VoiceConverter {Flatten Part} nil}
+	    {EtirerAux Voice}
+	     
+	 end %local
+      end %Etirer
       
 
       fun {DureeEchantillon ListEchantillon}
@@ -56,9 +74,10 @@ fun {Interprete Partition}
 		  {Muet P Duree}
 		  
 	       [] duree(secondes:S P) then
-		  	    TheVoice= echantillon(hauteur:Hauteur duree:Duree instrument:none)
+		  TheVoice= echantillon(hauteur:Hauteur duree:Duree instrument:none)
 
-	       [] etirer(facteur:F P) then skip
+	       [] etirer(facteur:F P) then
+		  TheVoice ={Etirer F [P]}
 	       [] bourdon(note:N P) then skip
 	       [] transpose(demitons:DT P) then skip
 	       [] silence  then  TheVoice=silence(duree:1)
@@ -67,9 +86,8 @@ fun {Interprete Partition}
 		  Hauteur={NumberDemiTons 3}
 		     
 	       end %case
-	       %{Browse 'ICI'}
-	       %{Browse {Append Acc [TheVoice]}}
-	       {VoiceConverter T {Append Acc TheVoice}}
+
+	       {VoiceConverter T {Append Acc {Flatten [TheVoice]}}}
 	    end%case   	    
 	 end%local
       end %VoiceConverter
@@ -95,7 +113,7 @@ fun {Interprete Partition}
       FlattenedPartition
       
    in
-      FlattenedPartition = {FlattenPartition Partition}
+      FlattenedPartition = {Flatten Partition}
       {VoiceConverter FlattenedPartition nil}
   
       
@@ -115,8 +133,12 @@ local
    
    Result
 in
-   Result = {Interprete [a b]}
+   %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
+   Result = {Interprete [etirer(facteur:3 [a b silence])]}
 
+   
    {Browse Result}
 end
+
+
