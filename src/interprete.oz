@@ -71,11 +71,39 @@ fun {Interprete Partition}
 	 end %local
       end %Bourdon
 
+      fun {Duree Secondes Part}
+	 local Voice DureeAux TotalDuration DurationVoice in
+	    fun {DureeAux V}
+	       case V of nil then nil
+	       [] E|T then
+		  case E of silence(duree:D) then silence(duree:D)|{DureeAux T}
+		  else echantillon(hauteur:E.hauteur
+				 duree:E.duree
+				 instrument:none)|{DureeAux T}
+		  end %case
+		
+	       end %case 
+	    end %DureeAux
+
+	    fun {DurationVoice P Acc}
+	       case P of nil then Acc
+	       [] H|T then {DurationVoice T Acc+H.duree}
+	       end
+	    end
+	    
+	
+	    Voice = {VoiceConverter {Flatten Part} nil}
+	    TotalDuration = {DurationVoice Voice 0}
+	    {DureeAux Voice} 
+	 end %local
+      end %Duree
+      
+      
       fun {Transpose Demitons Part}
 	 local Voice TransposeAux in
 	    fun {TransposeAux V}
 	       case V of nil then nil
-	       [] (E|T) then
+	       [] E|T then
 		  case E of silence(duree:D) then silence(duree:D)|{TransposeAux T}
 		  else echantillon(hauteur:E.hauteur+Demitons
 				   duree:E.duree
