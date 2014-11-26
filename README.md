@@ -12,6 +12,6 @@ A faire :
     * Duree
     * Etirer : done
     * Bourdon : done
-    * Transpose
+    * Transpose : done
 * Fonctions Mix
 * Extensions
