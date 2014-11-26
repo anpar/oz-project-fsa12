@@ -53,7 +53,8 @@ fun {Interprete Partition}
 	    {DureeEchantillonAux ListEchantillon 0}
 	 end 
       end
-      
+
+      % Transform a parition with the bourdon transformation
       fun {Bourdon Note Part}
 	 local Voice BourdonAux in
 	    fun {BourdonAux V}
@@ -71,14 +72,16 @@ fun {Interprete Partition}
 	 end %local
       end %Bourdon
 
-      fun {Duree Secondes Part}
+      % Transform a parition with the duree transformation
+      fun {DureeTrans WantedDuration Part}
 	 local Voice DureeAux TotalDuration DurationVoice in
 	    fun {DureeAux V}
 	       case V of nil then nil
 	       [] E|T then
-		  case E of silence(duree:D) then silence(duree:D)|{DureeAux T}
+		  case E of silence(duree:D)
+		  then silence(duree:(D*(WantedDuration div TotalDuration)))|{DureeAux T}
 		  else echantillon(hauteur:E.hauteur
-				 duree:E.duree
+				 duree:(E.duree*(WantedDuration div TotalDuration))
 				 instrument:none)|{DureeAux T}
 		  end %case
 		
@@ -96,7 +99,7 @@ fun {Interprete Partition}
 	    TotalDuration = {DurationVoice Voice 0}
 	    {DureeAux Voice} 
 	 end %local
-      end %Duree
+      end %DureeTrans
       
       
       fun {Transpose Demitons Part}
@@ -129,17 +132,11 @@ fun {Interprete Partition}
 	       of muet(P) then
 		  TheVoice=silence(duree:Duree)
 		  {Muet P Duree}
-		  
-	       [] duree(secondes:S P) then
-		  TheVoice= echantillon(hauteur:Hauteur duree:Duree instrument:none)
-
-	       [] etirer(facteur:F P) then
-		  TheVoice ={Etirer F [P]}
-	       [] bourdon(note:N P) then
-		  TheVoice ={Bourdon N [P]}
-	       [] transpose(demitons:DT P) then
-		  TheVoice ={Transpose DT [P]}
-	       [] silence  then  TheVoice=silence(duree:1)
+	       [] duree(secondes:S P) then TheVoice= {DureeTrans S [P]}
+	       [] etirer(facteur:F P) then TheVoice ={Etirer F [P]}
+	       [] bourdon(note:N P) then TheVoice ={Bourdon N [P]}
+	       [] transpose(demitons:DT P) then TheVoice ={Transpose DT [P]}
+	       [] silence  then TheVoice=silence(duree:1)
 	       else 
 		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
 		  Hauteur={NumberOfSemiTones {ToNote H}}
@@ -216,6 +213,6 @@ in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
    %Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]} %Probleme!!!
-   Result = {Interprete [transpose(demitons:3 [a b c d e silence]) a b c d e etirer(facteur:3 [a b e1 silence]) f]}
+   Result = {Interprete [duree(secondes:8 [a b c silence])]}
    {Browse Result}
 end
