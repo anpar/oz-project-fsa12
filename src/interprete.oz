@@ -91,10 +91,16 @@ fun {Interprete Partition}
 	    DeltaOctave = Note.octave - ReferenceNote.octave
 	    NoteNumber = {AtomToString (Note.nom)}.1
 	    ReferenceNoteNumber = {AtomToString (ReferenceNote.nom)}.1
-	    DeltaNote = NoteNumber - ReferenceNoteNumber -1
+	    DeltaNote
 	    Correction1
 	    Correction2
 	 in
+	    if Note.nom == a then
+	       DeltaNote = 0
+	    else
+	       DeltaNote = NoteNumber - ReferenceNoteNumber -1
+	    end
+	    
 	    if NoteNumber >= 99 then
 	       Correction1 = 1
 	    elseif NoteNumber >= 102 then
