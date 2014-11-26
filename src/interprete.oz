@@ -33,7 +33,7 @@ fun {Interprete Partition}
 		  case E of silence(duree:D) then silence(duree:Facteur*D)|{EtirerAux T}
 		  else echantillon(hauteur:E.hauteur
 				   duree:(E.duree*Facteur)
-				   instrument:E.instrument)|{EtirerAux T}
+				   instrument:none)|{EtirerAux T}
 		  end 
 	       end 
 	    end 
@@ -52,7 +52,24 @@ fun {Interprete Partition}
 	    end 
 	    {DureeEchantillonAux ListEchantillon 0}
 	 end 
-      end 
+      end
+      
+      fun {Bourdon Note Part}
+	 local Voice BourdonAux in
+	    fun {BourdonAux V}
+	       case Note#V of M#nil then nil
+	       [] silence#(E|T) then silence(duree:E.duree)|{BourdonAux T}
+	       [] M#(E|T) then
+		  echantillon(hauteur:{NumberOfSemiTones {ToNote Note}}
+			      duree:E.duree
+			      instrument:none)|{BourdonAux T}
+		
+	       end %case 
+	    end %BourdonAux
+	    Voice = {VoiceConverter {Flatten Part} nil}
+	    {BourdonAux Voice} 
+	 end %local
+      end %Bourdon
       
       % Convert a partition to a voice, which is a list of echantillon
       fun {VoiceConverter Part Acc}
@@ -72,7 +89,8 @@ fun {Interprete Partition}
 
 	       [] etirer(facteur:F P) then
 		  TheVoice ={Etirer F [P]}
-	       [] bourdon(note:N P) then skip
+	       [] bourdon(note:N P) then
+		  TheVoice ={Bourdon N [P]}
 	       [] transpose(demitons:DT P) then skip
 	       [] silence  then  TheVoice=silence(duree:1)
 	       else 
@@ -149,6 +167,7 @@ local
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
-   Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 e2 c#2]}
+   %Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]} %Probleme!!!
+   Result = {Interprete [bourdon(note:a5 [a b c d e etirer(facteur:3 [a b e1 silence]) f])]}
    {Browse Result}
 end
