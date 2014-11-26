@@ -9,7 +9,7 @@ A faire :
     * VoiceConverter
     * NumberOrSemitones : done
     * Muet : done
-    * Duree
+    * Duree : done (small bug)
     * Etirer : done
     * Bourdon : done
     * Transpose : done
