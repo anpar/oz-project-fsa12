@@ -70,6 +70,24 @@ fun {Interprete Partition}
 	    {BourdonAux Voice} 
 	 end %local
       end %Bourdon
+
+      fun {Transpose Demitons Part}
+	 local Voice TransposeAux in
+	    fun {TransposeAux V}
+	       case V of nil then nil
+	       [] (E|T) then
+		  case E of silence(duree:D) then silence(duree:D)|{TransposeAux T}
+		  else echantillon(hauteur:E.hauteur+Demitons
+				   duree:E.duree
+				   instrument:none)|{TransposeAux T}
+		  end %case
+	       end %case 
+	    end %TransposeAux
+	    Voice = {VoiceConverter {Flatten Part} nil}
+	    {TransposeAux Voice} 
+	 end %local
+      end %Transpose
+      
       
       % Convert a partition to a voice, which is a list of echantillon
       fun {VoiceConverter Part Acc}
@@ -91,7 +109,8 @@ fun {Interprete Partition}
 		  TheVoice ={Etirer F [P]}
 	       [] bourdon(note:N P) then
 		  TheVoice ={Bourdon N [P]}
-	       [] transpose(demitons:DT P) then skip
+	       [] transpose(demitons:DT P) then
+		  TheVoice ={Transpose DT [P]}
 	       [] silence  then  TheVoice=silence(duree:1)
 	       else 
 		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
@@ -100,7 +119,8 @@ fun {Interprete Partition}
 	       {VoiceConverter T {Append Acc {Flatten [TheVoice]}}}
 	    end 	    
 	 end
-      end 
+      end
+      
 
       % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
       fun {NumberOfSemiTones Note}
@@ -168,6 +188,6 @@ in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
    %Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]} %Probleme!!!
-   Result = {Interprete [bourdon(note:a5 [a b c d e etirer(facteur:3 [a b e1 silence]) f])]}
+   Result = {Interprete [transpose(demitons:3 [a b c d e silence]) a b c d e etirer(facteur:3 [a b e1 silence]) f]}
    {Browse Result}
 end
