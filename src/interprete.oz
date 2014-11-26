@@ -143,6 +143,6 @@ local
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
-   Result = {Interprete [etirer(facteur:3 [a b e1 silence])]}
+   Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 e2 c#2]}
    {Browse Result}
 end
