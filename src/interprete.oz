@@ -79,9 +79,9 @@ fun {Interprete Partition}
 	       case V of nil then nil
 	       [] E|T then
 		  case E of silence(duree:D)
-		  then silence(duree:(D*(WantedDuration div TotalDuration)))|{DureeAux T}
+		  then silence(duree:({IntToFloat D}*({IntToFloat WantedDuration}/{IntToFloat TotalDuration})))|{DureeAux T}
 		  else echantillon(hauteur:E.hauteur
-				 duree:(E.duree*(WantedDuration div TotalDuration))
+				 duree:({IntToFloat E.duree}*({IntToFloat WantedDuration}/{IntToFloat TotalDuration}))
 				 instrument:none)|{DureeAux T}
 		  end %case
 		
@@ -213,6 +213,6 @@ in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
    %Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
    %Result = {Interprete [etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]} %Probleme!!!
-   Result = {Interprete [duree(secondes:8 [a b c silence])]}
+   Result = {Interprete [duree(secondes:9 [a b c silence])]}
    {Browse Result}
 end
