@@ -9,9 +9,10 @@ A faire :
     * VoiceConverter
     * NumberOrSemitones : done
     * Muet : done
-    * Duree : done (small bug)
+    * Duree : done
     * Etirer : done
     * Bourdon : done
     * Transpose : done
+    * _OPTIMISATION_
 * Fonctions Mix
 * Extensions
