@@ -1,7 +1,10 @@
 declare
 fun {Interprete Partition}
+   % Local to declare all the auxiliary function
    local
-
+      % ================
+      %  VOICECONVERTER
+      % ================
       % Convert a partition to a voice, which is a list of sample
       fun {VoiceConverter Part}
 	 local VoiceConverterAux in
@@ -28,12 +31,14 @@ fun {Interprete Partition}
 		     {VoiceConverterAux T {Append Acc {Flatten [Sample]}}} 
 		  end 	    
 	       end
-	    end %VoiceConverterAux
+	    end 
 	    {VoiceConverterAux Part nil}
 	 end
-      end %VoiceConverter
+      end 
 
-      
+      % ================
+      %       MUET
+      % ================
       % Transform a partition with the muet transformation
       proc {Muet Partition Duree}
 	 local FlatPart in  
@@ -42,14 +47,14 @@ fun {Interprete Partition}
 	 end
       end
 
-      
+      % ================
+      %    DUREETRANS
+      % ================
       % Transform a partition with the duree transformation
       fun {DureeTrans WantedDuration Part}
 	 local Voice DureeAux TotalDuration in
-	    
 	    Voice = {VoiceConverter {Flatten Part}}
 	    TotalDuration = {VoiceDuration Voice}
-	    
 	    fun {DureeAux V}
 	       case V of nil then nil
 	       [] E|T then
@@ -60,13 +65,14 @@ fun {Interprete Partition}
 				   instrument:none)|{DureeAux T}
 		  end
 	       end
-	    end %DureeAux
-
+	    end 
 	    {DureeAux Voice} 	   
 	 end
       end
 
-      
+      % ================
+      %      ETIRER
+      % ================
       % Transform a partition with the etirer transformation
       fun {Etirer Facteur Part}
 	 local Voice EtirerAux in
@@ -85,7 +91,9 @@ fun {Interprete Partition}
 	 end 
       end 
 
-      
+      % ================
+      %     BOURDON
+      % ================
       % Transform a partition with the bourdon transformation
       fun {Bourdon Note Part}
 	 local Voice BourdonAux in
@@ -96,15 +104,16 @@ fun {Interprete Partition}
 		  echantillon(hauteur:{NumberOfSemiTones {ToNote Note}}
 			      duree:E.duree
 			      instrument:none)|{BourdonAux T}
-		
-	       end %case 
-	    end %BourdonAux
+	       end 
+	    end 
 	    Voice = {VoiceConverter {Flatten Part}}
 	    {BourdonAux Voice} 
-	 end %local
-      end %Bourdon
+	 end 
+      end 
 
-      
+      % ================
+      %    TRANSPOSE
+      % ================
       % Transform a partition with the transpose transformation
       fun {Transpose Demitons Part}
 	 local Voice TransposeAux in
@@ -115,15 +124,17 @@ fun {Interprete Partition}
 		  else echantillon(hauteur:E.hauteur+Demitons
 				   duree:E.duree
 				   instrument:none)|{TransposeAux T}
-		  end %case
-	       end %case 
-	    end %TransposeAux
+		  end
+	       end
+	    end
 	    Voice = {VoiceConverter {Flatten Part}}
 	    {TransposeAux Voice} 
-	 end %local
-      end %Transpose
+	 end
+      end
 
-      
+      % ================
+      %  VOICEDURATION
+      % ================
       % Compute the duration of a voice
       fun {VoiceDuration ListEchantillon}
 	 local VoiceDurationAux in
@@ -136,7 +147,9 @@ fun {Interprete Partition}
 	 end 
       end
 
-      
+      % =================
+      % NUMBEROFSEMITONES
+      % =================
       % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
       fun {NumberOfSemiTones Note}
 	 local
@@ -152,18 +165,19 @@ fun {Interprete Partition}
 	       Correction1 = 1
 	    else
 	       Correction1 = 0
-	    end
-	      
+	    end 
 	    if Note.alteration == '#' then
 	       Correction2 = 1
 	    else
 	       Correction2 = 0
 	    end
-
 	    12*DeltaOctave + 2*DeltaNote + Correction1 + Correction2
 	 end
       end
 
+      % ================
+      %  NAMETONUMBER
+      % ================
       % Transform the name of a note to a number
       fun {NameToNumber Name}
 	 case Name of c then 1
@@ -176,7 +190,9 @@ fun {Interprete Partition}
 	 end
       end
 
-      
+      % ================
+      %      TONOTE
+      % ================
       % Transform a note in the extended format
       % Nom | Nom#Octave | NomOctave -> note(nom:Nom octave:Octave alteration:'#'|none)
       fun {ToNote Note}
@@ -192,9 +208,7 @@ fun {Interprete Partition}
 	 end
       end
       
-      
       FlattenedPartition
-      
    in
       FlattenedPartition = {Flatten Partition}
       {VoiceConverter FlattenedPartition}
