@@ -24,7 +24,7 @@ fun {Interprete Partition}
 	 end 
       end 
 
-      % Transform a parition with the etirer transformation
+      % Transform a partition with the etirer transformation
       fun {Etirer Facteur Part}
 	 local Voice EtirerAux in
 	    fun {EtirerAux V}
@@ -54,7 +54,7 @@ fun {Interprete Partition}
 	 end 
       end
 
-      % Transform a parition with the bourdon transformation
+      % Transform a partition with the bourdon transformation
       fun {Bourdon Note Part}
 	 local Voice BourdonAux in
 	    fun {BourdonAux V}
@@ -72,7 +72,7 @@ fun {Interprete Partition}
 	 end %local
       end %Bourdon
 
-      % Transform a parition with the duree transformation
+      % Transform a partition with the duree transformation
       fun {DureeTrans WantedDuration Part}
 	 local Voice DureeAux TotalDuration DurationVoice in
 	    fun {DureeAux V}
@@ -141,7 +141,7 @@ fun {Interprete Partition}
 		  TheVoice= echantillon(hauteur:Hauteur duree:1 instrument:none)
 		  Hauteur={NumberOfSemiTones {ToNote H}}
 	       end 
-	       {VoiceConverter T {Append Acc {Flatten [TheVoice]}}}
+	       {VoiceConverter T {Append Acc {Flatten [TheVoice]}}} % FIX : pourquoi on appelle Flatten ici?
 	    end 	    
 	 end
       end
@@ -186,6 +186,8 @@ fun {Interprete Partition}
       end
 
       % Compute the number of note in a partition
+      % Est-ce que cette fonction compte juste les éléments de la liste Partition?
+      % Parce que si oui on peut utiliser {Length Partition} directement
       fun {NumberOfNote Partition}
 	 local NumberOfNoteAux in
 	    fun {NumberOfNoteAux P Acc}
@@ -196,6 +198,7 @@ fun {Interprete Partition}
 	    {NumberOfNoteAux Partition 0}
 	 end
       end
+      
       FlattenedPartition
    in
       FlattenedPartition = {Flatten Partition}
