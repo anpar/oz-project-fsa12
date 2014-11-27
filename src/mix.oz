@@ -1,11 +1,11 @@
 declare
-% Retourne un unique vecteur audio, c'est à dire une liste
+% Retourne un unique vecteur audio, c'est a dire une liste
 % de flottans compris entre -1.0 et 1.0
 % <musique> ::= nil | <morceau> '|' <musique>
 % <morceau> ::= voix(<voix)) | partition(<partition>)
-% | wave(<nom de fichier>) | <filtre> | merge(<musiques avec intensités)
+% | wave(<nom de fichier>) | <filtre> | merge(<musiques avec intensites)
 %
-% Idée de base : Mix est une fonction récursive (terminale si possible)
+% Idee de base : Mix est une fonction recursive (terminale si possible)
 % avec un accumulateur
 
 fun {Mix Interprete Music}
@@ -13,8 +13,8 @@ fun {Mix Interprete Music}
       % =================
       %        FILL
       % =================
-      % TODO : il faudra expliquer dans le rapport la subtilité
-      % utilisée dans Append pour gagner du temps.
+      % TODO : il faudra expliquer dans le rapport la subtilite
+      % utilisee dans Append pour gagner du temps.
       fun {Fill F Duree}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
@@ -40,11 +40,11 @@ fun {Mix Interprete Music}
 		  local F in
 		     F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
 		     {MixVoiceAux T {Append {Fill F H.duree} AudioVector}}
-		     % FIX : on aura aussi un problème de rapidité ici
-		     % avec la fonction Append à mon avis, il faudra tester.
-		     % Cependant je ne vois pas comment on pourrait règler le problème ici...
+		     % FIX : on aura aussi un probleme de rapidite ici
+		     % avec la fonction Append a mon avis, il faudra tester.
+		     % Cependant je ne vois pas comment on pourrait regler le probleme ici...
 		     % Le mieux qu'on puisse faire c'est placer le plus petit vecteur, c'est
-		     % à dire a priori {Fill F H.duree}.
+		     % a dire a priori {Fill F H.duree}.
 		  end
 	       end
 	    end
