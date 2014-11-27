@@ -13,7 +13,7 @@ A faire :
     * Etirer : done
     * Bourdon : done
     * Transpose : done
-    * _OPTIMISATION_ : done
+    * Optimisation : done
 * Fonctions Mix
     * Fill : done
     * MixVoice :
