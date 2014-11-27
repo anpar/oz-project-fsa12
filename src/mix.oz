@@ -11,20 +11,23 @@ fun {Mix Interprete Music}
    local MixVoice MixAux Fill in
       % =================
       %        FILL
-      % ================= 
+      % =================
+      declare
       fun {Fill F Duree}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
-	    fun {FillAux F Duree AudioVector Length}
+	    fun {FillAux Length AudioVector}
 	       if Length >= DesiredLength then
-		  AudioVector
+		  {Reverse AudioVector}
 	       else
-		  {FillAux F Duree AudioVector|(0.5*{Sin (2.0*3.1415*F*Length)/44100.0}) Length+1}
+		  {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
 	       end
 	    end
-	    {FillAux F Duree nil 0}
+	    {FillAux 0.0 nil}
 	 end
       end
+
+      {Browse {Fill 440.0 1.0}}
 
       % =================
       %     MIXVOICE
@@ -49,9 +52,9 @@ fun {Mix Interprete Music}
 	 case Music of nil then AudioVector
 	 [] H|T then
 	    case H of voix(V) then
-	       {MixAux Interprete T AudioVector|{MixVoice V}}
+	       {MixAux Interprete T {Append AudioVector {MixVoice V}}}
 	    [] partition(P) then
-	       {MixAux Interprete T AudioVector|{Mix Interprete voix({Interprete P})}}
+	       {MixAux Interprete T {Append AudioVector {Mix Interprete voix({Interprete P})}}}
 	    [] wave(F) then
 	       todo
 	    [] merge(M) then
@@ -65,4 +68,3 @@ fun {Mix Interprete Music}
    end
 end
 
-   
