@@ -7,12 +7,14 @@ declare
 %
 % Idée de base : Mix est une fonction récursive (terminale si possible)
 % avec un accumulateur
+
 fun {Mix Interprete Music}
    local MixVoice MixAux Fill in
       % =================
       %        FILL
       % =================
-      declare
+      % TODO : il faudra expliquer dans le rapport la subtilité
+      % utilisée dans Append pour gagner du temps.
       fun {Fill F Duree}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
@@ -27,8 +29,6 @@ fun {Mix Interprete Music}
 	 end
       end
 
-      {Browse {Fill 440.0 1.0}}
-
       % =================
       %     MIXVOICE
       % =================
@@ -39,14 +39,21 @@ fun {Mix Interprete Music}
 	       [] H|T then
 		  local F in
 		     F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
-		     
+		     {MixVoiceAux T {Append {Fill F H.duree} AudioVector}}
+		     % FIX : on aura aussi un problème de rapidité ici
+		     % avec la fonction Append à mon avis, il faudra tester.
+		     % Cependant je ne vois pas comment on pourrait règler le problème ici...
+		     % Le mieux qu'on puisse faire c'est placer le plus petit vecteur, c'est
+		     % à dire a priori {Fill F H.duree}.
+		  end
+	       end
 	    end
 	    {MixVoiceAux V nil}
 	 end
       end
-
+	 
       % ================
-      %     MIXAUX
+      %      MIXAUX
       % ================
       fun {MixAux Interprete Music AudioVector}
 	 case Music of nil then AudioVector
@@ -67,4 +74,5 @@ fun {Mix Interprete Music}
       {MixAux Interprete Music nil}
    end
 end
+     
 
