@@ -81,8 +81,8 @@ fun {Interprete Partition}
 		  case E of silence(duree:D)
 		  then silence(duree:({IntToFloat D}*({IntToFloat WantedDuration}/{IntToFloat TotalDuration})))|{DureeAux T}
 		  else echantillon(hauteur:E.hauteur
-				 duree:({IntToFloat E.duree}*({IntToFloat WantedDuration}/{IntToFloat TotalDuration}))
-				 instrument:none)|{DureeAux T}
+				   duree:({IntToFloat E.duree}*({IntToFloat WantedDuration}/{IntToFloat TotalDuration}))
+				   instrument:none)|{DureeAux T}
 		  end %case
 		
 	       end %case 
@@ -147,27 +147,19 @@ fun {Interprete Partition}
       end
       
 
-      % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
+  % Compute the number of semitones above or below note a4. The argument note is already in the extended format.
       fun {NumberOfSemiTones Note}
 	 local
 	    ReferenceNote = note(nom:a octave:4 alteration:none) 
 	    DeltaOctave = Note.octave - ReferenceNote.octave
-	    NoteNumber = {AtomToString (Note.nom)}.1
-	    ReferenceNoteNumber = {AtomToString (ReferenceNote.nom)}.1
-	    DeltaNote
+	    NoteNumber = {NameToNumber Note.nom}
+	    ReferenceNoteNumber = {NameToNumber ReferenceNote.nom}
+	    DeltaNote = NoteNumber - ReferenceNoteNumber
 	    Correction1
 	    Correction2
-	 in
-	    if Note.nom == a then
-	       DeltaNote = 0
-	    else
-	       DeltaNote = NoteNumber - ReferenceNoteNumber -1
-	    end
-	    
-	    if NoteNumber >= 99 then
+	 in	    
+	    if NoteNumber =< 3 then
 	       Correction1 = 1
-	    elseif NoteNumber >= 102 then
-	       Correction1 = 2
 	    else
 	       Correction1 = 0
 	    end
@@ -178,7 +170,18 @@ fun {Interprete Partition}
 	       Correction2 = 0
 	    end
 
-	    12*DeltaOctave - 2*DeltaNote + Correction1 + Correction2
+	    12*DeltaOctave + 2*DeltaNote + Correction1 + Correction2
+	 end
+      end
+
+      fun {NameToNumber Name}
+	 case Name of c then 1
+	 [] d then 2
+	 [] e then 3
+	 [] f then 4
+	 [] g then 5
+	 [] a then 6
+	 [] b then 7
 	 end
       end
 
