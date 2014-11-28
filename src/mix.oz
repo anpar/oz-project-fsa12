@@ -1,6 +1,6 @@
 declare
 % Retourne un unique vecteur audio, c'est a dire une liste
-% de flottans compris entre -1.0 et 1.0
+% de flottants compris entre -1.0 et 1.0
 % <musique> ::= nil | <morceau> '|' <musique>
 % <morceau> ::= voix(<voix)) | partition(<partition>)
 % | wave(<nom de fichier>) | <filtre> | merge(<musiques avec intensites)
@@ -22,7 +22,7 @@ fun {Mix Interprete Music}
 	       if Length >= DesiredLength then
 		  {Reverse AudioVector}
 	       else
-		  {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
+		  {FillAux Length+1.0 (0.5*{Sin (2.0*3.1415*F*Length)/44100.0})|AudioVector}
 	       end
 	    end
 	    {FillAux 0.0 nil}
@@ -55,13 +55,13 @@ fun {Mix Interprete Music}
       % ================
       %      MIXAUX
       % ================
-      fun {MixAux Interprete Music AudioVector}
-	 case Music of nil then AudioVector
+      fun {MixAux Music AudioVector}
+	 case Music of nil then {Reverse AudioVector}
 	 [] H|T then
 	    case H of voix(V) then
-	       {MixAux Interprete T {Append AudioVector {MixVoice V}}}
+	       {MixAux T {MixVoice V}|AudioVector}
 	    [] partition(P) then
-	       {MixAux Interprete T {Append AudioVector {Mix Interprete voix({Interprete P})}}}
+	       {MixAux T {Mix Interprete voix({Interprete P})}|AudioVector}
 	    [] wave(F) then
 	       todo
 	    [] merge(M) then
@@ -71,7 +71,7 @@ fun {Mix Interprete Music}
 	    end
 	 end   
       end
-      {MixAux Interprete Music nil}
+      {MixAux Music nil}
    end
 end
      
