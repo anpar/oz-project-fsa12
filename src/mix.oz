@@ -15,14 +15,14 @@ fun {Mix Interprete Music}
       % =================
       % TODO : il faudra expliquer dans le rapport la subtilite
       % utilisee dans Append pour gagner du temps.
+      
       fun {Fill F Duree}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
 	    fun {FillAux Length AudioVector}
-	       if Length >= DesiredLength then
-		  {Reverse AudioVector}
+	       if Length >= DesiredLength then {Reverse AudioVector}
 	       else
-		  {FillAux Length+1.0 (0.5*{Sin (2.0*3.1415*F*Length)/44100.0})|AudioVector}
+		  {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
 	       end
 	    end
 	    {FillAux 0.0 nil}
@@ -61,7 +61,7 @@ fun {Mix Interprete Music}
 	    case H of voix(V) then
 	       {MixAux T {MixVoice V}|AudioVector}
 	    [] partition(P) then
-	       {MixAux T {MixVoice {Interprete P}}|AudioVector}
+	       {MixAux T {Append {MixVoice {Interprete P}} AudioVector}}
 
 	    [] wave(F) then
 	       todo
@@ -323,13 +323,12 @@ in
    %Result ={Interprete [a5 transpose(demitons:1 [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])])]}
    %{Browse Result}
 
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Change ;)
+  % CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Change ;)
 
    %Macintosh HD/Users/Philippe ▸ Desktop ▸ oz-project-fsa12
    
-   [Projet] = {Link ['/Volumes/Macintosh HD/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']} %PROBLEM!!!!!
-   {Browse Projet}
+   [Projet] = {Link ['C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
    {Browse Projet.hz}
-   {Browse {Projet.writeFile CWD#'out.wav' [0 1 0 1]}}    %{Mix Interprete [partition([a b c])]}}}
+   {Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b])]}}}
 end
 

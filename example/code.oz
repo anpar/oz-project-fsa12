@@ -9,9 +9,9 @@ local Mix Interprete Projet CWD in
    %
    % Projet fournit quatre fonctions :
    % {Projet.run Interprete Mix Music 'out.wav'} = ok OR error(...) 
-   % {Projet.readFile FileName} = audioVector(AudioVector) OR error(...)
+   % {Projet.readFile FileName} = AudioVector OR error(...)
    % {Projet.writeFile FileName AudioVector} = ok OR error(...)
-   % {Projet.load 'music_file.oz'} = Oz structure.
+   % {Projet.load 'music_file.dj.oz'} = La valeur oz contenue dans le fichier chargé (normalement une <musique>).
    %
    % et une constante :
    % Projet.hz = 44100, la fréquence d'échantilonnage (nombre de données par seconde)
