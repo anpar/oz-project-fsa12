@@ -25,10 +25,10 @@ fun {Interprete Partition}
 		     [] transpose(demitons:DT P) then Sample={Transpose DT [P]}
 		     [] silence  then Sample=silence(duree:1.0)
 		     else 
-			Sample=echantillon(hauteur:Hauteur duree:1.0 instrument:none)
+			Sample=[echantillon(hauteur:Hauteur duree:1.0 instrument:none)]
 			Hauteur={NumberOfSemiTones {ToNote H}}
 		     end 
-		     {VoiceConverterAux T {Append Acc {Flatten [Sample]}}} 
+		     {VoiceConverterAux T {Append Acc Sample}} 
 		  end 	    
 	       end
 	    end 
