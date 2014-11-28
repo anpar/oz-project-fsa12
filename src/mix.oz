@@ -326,9 +326,16 @@ in
   % CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Change ;)
 
    %Macintosh HD/Users/Philippe ▸ Desktop ▸ oz-project-fsa12
-   
-   [Projet] = {Link ['C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
+
+   % For windows
+   %[Projet] = {Link ['C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
+   %{Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
+
+   % For mac
+   [Projet] = {Link ['/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
+   {Browse Projet}
    {Browse Projet.hz}
-   {Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
+   {Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
+
 end
 
