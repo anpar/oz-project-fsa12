@@ -56,12 +56,12 @@ fun {Mix Interprete Music}
       %      MIXAUX
       % ================
       fun {MixAux Music AudioVector}
-	 case Music of nil then {Reverse AudioVector}
+	 case Music of nil then AudioVector
 	 [] H|T then
 	    case H of voix(V) then
 	       {MixAux T {MixVoice V}|AudioVector}
 	    [] partition(P) then
-	       {MixAux T {Append {MixVoice {Interprete P}} AudioVector}}
+	       {MixAux T {Append AudioVector {MixVoice {Interprete P}}}}
 
 	    [] wave(F) then
 	       todo
@@ -329,6 +329,6 @@ in
    
    [Projet] = {Link ['C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
    {Browse Projet.hz}
-   {Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b])]}}}
+   {Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
 end
 
