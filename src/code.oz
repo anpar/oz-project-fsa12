@@ -3,7 +3,7 @@ local Mix Interprete Projet CWD in
    % CWD contient le chemin complet vers le dossier contenant le fichier 'code.oz'
    % modifiez sa valeur pour correspondre à votre système.
 
-   %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} %Windows Phil
+   %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
    CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Mac Phil
 
    % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
@@ -32,70 +32,117 @@ local Mix Interprete Projet CWD in
       % Idee de base : Mix est une fonction recursive (terminale si possible)
       % avec un accumulateur
       fun {Mix Interprete Music}
-	 local MixVoice MixAux Fill in
             % =================
             %        FILL
             % =================
             % TODO : il faudra expliquer dans le rapport la subtilite
             % utilisee dans Append pour gagner du temps.
-	    fun {Fill F Duree}
-	       local FillAux DesiredLength in
-		  DesiredLength = 44100.0*Duree
-		  fun {FillAux Length AudioVector}
-		     if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment nécessaire de faire un reverse pour une note?
-		     else
-			{FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
-		     end
+	 fun {Fill F Duree}
+	    local FillAux DesiredLength in
+	       DesiredLength = 44100.0*Duree
+	       fun {FillAux Length AudioVector}
+		  if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment nécessaire de faire un reverse pour une note?
+		  else
+		     {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
 		  end
-		  {FillAux 0.0 nil}
 	       end
+	       {FillAux 0.0 nil}
 	    end
+	 end
 
             % =================
             %     MIXVOICE
             % =================
-	    fun {MixVoice V}
-	       local MixVoiceAux in
-		  fun {MixVoiceAux V AudioVector}
-		     case V of nil then {Flatten {Reverse AudioVector}}
-		     []H|T then
-			local F in 
-			   case H of silence(duree:D) then F=0.0
-			   else F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
-			   end
+	 fun {MixVoice V}
+	    local MixVoiceAux in
+	       fun {MixVoiceAux V AudioVector}
+		  case V of nil then {Flatten {Reverse AudioVector}}
+		  []H|T then
+		     local F in 
+			case H of silence(duree:D) then F=0.0
+			else F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
+			end
 		     
-			   {MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
         		   % FIX : on aura aussi un probleme de rapidite ici
 		           % avec la fonction Append a mon avis, il faudra tester.
 		           % Cependant je ne vois pas comment on pourrait regler le probleme ici...
 		           % Le mieux qu'on puisse faire c'est placer le plus petit vecteur, c'est
 		           % a dire a priori {Fill F H.duree}.
-			end
 		     end
-		  end %MixVoiceAux
-		  {MixVoiceAux V nil}
-	       end
-	    end %MixVoice
+		  end
+	       end %MixVoiceAux
+	       {MixVoiceAux V nil}
+	    end
+	 end %MixVoice
 	 
             % ================
-            %      MIXAUX
+            %      MIXMUSIC
             % ================
-	    fun {MixAux Music AudioVector}
-	       case Music of nil then {Flatten {Reverse AudioVector}}
-	       [] H|T then
-		  case H of voix(V) then {MixAux T {Append AudioVector [{MixVoice V}]}}
-		  [] partition(P) then {MixAux T {Append AudioVector [{MixVoice {Interprete P}}]}}
-		  [] wave(F) then todo
-		  [] merge(M) then todo
-		  else % Cas des filtres
-		     todo
-		  end
-	       end   
+	 fun {MixMusic Music}
+	    local MixMusicAux in
+	       fun {MixMusicAux Music AudioVector}
+		  case Music of nil then {Flatten {Reverse AudioVector}}
+		  [] H|T then
+		     case H of voix(V) then {MixMusicAux T {Append AudioVector [{MixVoice V}]}}
+		     [] partition(P) then {MixMusicAux T {Append AudioVector [{MixVoice {Interprete P}}]}}
+		     [] wave(F) then {MixMusicAux T {Append AudioVector [{Projet.readFile F}]}}
+		     [] merge(M) then {MixMusicAux T {Append AudioVector [{Merge M}]}}
+		     else % Cas des filtres
+			todo
+		     end
+		  end   
+	       end %MixMusicAux
+	       {MixMusicAux Music nil}
 	    end
-	    {MixAux Music nil}
-	 end
-      end
+	 end %MixMusic
+	    
+	 
+            % ================
+            %      MERGE
+            % ================
+	 fun {Merge MusicsWithIntensity}
+	    local MergeAux in
+	       fun {MergeAux M AudioVector}
+		  case M of nil then AudioVector
+		  [] H|T then
+		     case H of Intensity#NewMusic then
+			fun {Multiply L Acc}
+			   case L of nil then {Reverse Acc}
+			   []B|E then {Multiply E B*Intensity|Acc}
+			   end
+			end
+			NewAudioVector
+		     in
+			NewAudioVector = {Multiply {MixMusic NewMusic} nil}
+			{MergeAux T {Combine AudioVector NewAudioVector}}
+		     end
+		  end
+	       end %MergeAux
+	       {MergeAux MusicsWithIntensity nil}
+	    end
+	 end %Merge
 
+	    % ================
+            %      COMBINE
+            % ================
+	 fun {Combine L1 L2}
+	    fun {CombineAux L1 L2 Acc}
+	       case L1#L2 of nil#nil then {Reverse Acc}
+	       [](H1|T1)#(H2|T2) then {CombineAux T1 T2 {Append [H1+H2] Acc}}
+	       [] (H|T)#nil then {CombineAux T nil {Append [H] Acc}}
+	       [] nil#(H|T) then {CombineAux nil T {Append [H] Acc}}
+	       end
+	    end 
+	 in
+	    {CombineAux L1 L2 nil}
+	 end % Combine
+
+      in
+	 {MixMusic Music}
+	 
+      end %Mix
+	 
 
 
       % Interprete doit interpréter une partition
@@ -317,7 +364,8 @@ local Mix Interprete Projet CWD in
    end
 
    local 
-      Music = {Projet.load CWD#'joie.dj.oz'}
+      Joie = {Projet.load CWD#'joie.dj.oz'}
+      Music = [merge([0.2#Joie 0.8#[wave(CWD#'wave/animaux/cat.wav')]])]
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui démontre les fonctionalités de votre
@@ -325,6 +373,7 @@ local Mix Interprete Projet CWD in
       %
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
+      {Browse begin}
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
 end
