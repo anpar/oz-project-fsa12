@@ -84,23 +84,26 @@ local Mix Interprete Projet CWD in
 	       fun {MixMusicAux Music AudioVector}
 		  case Music of nil then {Flatten {Reverse AudioVector}}
 		  [] H|T then
-		     case H of voix(V) then {MixMusicAux T {Append AudioVector [{MixVoice V}]}}
-		     [] partition(P) then {MixMusicAux T {Append AudioVector [{MixVoice {Interprete P}}]}}
-		     [] wave(F) then {MixMusicAux T {Append AudioVector [{Projet.readFile F}]}}
-		     [] merge(M) then {MixMusicAux T {Append AudioVector [{Merge M}]}}
-		     [] renverser(M) then todo
-		     [] repetition(nombre:N M) then todo
-		     [] repetition(duree:D M) then todo
-		     [] clip(bas:Bas haut:Haut M) then todo
-		     [] echo(delai:S M) then todo
-		     [] echo(delai:S decadence:F M) then todo
-		     [] echo(delai:S decadence:F repetition:N M) then todo
-		     [] fondu(ouverture:S1 fermeture:S2 M) then todo
-		     [] fondu_enchaine(duree:S M1 M2) then todo
-		     [] couper(debut:S1 fin:S2 M) then todo
+		     NewAV
+		  in
+		     case H of voix(V) then NewAV = {MixVoice V} 
+		     [] partition(P) then NewAV = {MixVoice {Interprete P}}
+		     [] wave(F) then NewAV = {Projet.readFile F}
+		     [] merge(M) then NewAV = {Merge M}
+		     [] renverser(M) then NewAV = {Reverse {MixMusic M}}
+		     [] repetition(nombre:N M) then NewAV = {RepetitionNB N {MixMusic M}}
+		     [] repetition(duree:D M) then NewAV = {RepetitionDuree D {MixMusic M}}
+		     [] clip(bas:Bas haut:Haut M) then NewAV = {Clip Bas Haut {MixMusic M}}
+		     [] echo(delai:S M) then NewAV = nil
+		     [] echo(delai:S decadence:F M) then  NewAV = nil
+		     [] echo(delai:S decadence:F repetition:N M) then NewAV = nil
+		     [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = nil
+		     [] fondu_enchaine(duree:S M1 M2) then  NewAV = nil
+		     [] couper(debut:S1 fin:S2 M) then  NewAV = nil
 		     else 
-			errormatching
+			NewAV = errormatching
 		     end
+		     {MixMusicAux T {Append AudioVector [NewAV]}}
 		  end   
 	       end %MixMusicAux
 	       {MixMusicAux Music nil}
@@ -128,9 +131,9 @@ local Mix Interprete Projet CWD in
 	    end
 	 end %Merge
 
-	    % ================
-            %      COMBINE
-            % ================
+	 % ================
+         %      COMBINE
+         % ================
 	 fun {Combine L1 L2}
 	    fun {CombineAux L1 L2 Acc}
 	       case L1#L2 of nil#nil then {Reverse Acc}
@@ -143,6 +146,60 @@ local Mix Interprete Projet CWD in
 	    {CombineAux L1 L2 nil}
 	 end % Combine
 
+
+	 fun {Clip Bas Haut OldAudioVector}
+	    fun {ClipAux L Acc}
+	       case L of nil then {Reverse Acc}
+	       [] H|T then
+		  if H < Bas then {ClipAux T Bas|Acc}
+		  elseif H > Haut then {ClipAux T Haut|Acc}
+		  else
+		     {ClipAux T H|Acc}
+		  end
+	       end
+	    end
+	 in
+	    {ClipAux OldAudioVector nil}
+	 end
+
+
+
+	 fun {RepetitionNB NB AV}
+	    fun {RepetitionNBAux NB Acc}
+	       if NB==0 then Acc
+	       else
+		  {RepetitionNBAux NB-1 {Append AV Acc}}
+	       end
+	    end
+	 in
+	    {RepetitionNBAux NB nil}
+	 end
+
+
+	 
+	 fun {RepetitionDuree Duree AV}
+	    Leng={Length AV}
+	    DureeAux={FloatToInt Duree*44100.0}
+	    NB=DureeAux div Leng
+	    Remaining=DureeAux mod Leng
+	    fun {FillEnd Remain AV Acc}
+	       if Remain == 0 then {Reverse Acc}
+	       else
+		  case AV of H|T then
+		     {FillEnd Remain-1 T H|Acc}
+		  end
+	       end	       
+	    end
+	 in
+	    {Append {RepetitionNB NB AV} {FillEnd Remaining AV nil}}
+	 end
+	 
+	 
+	 
+	 
+
+
+	 
       in
 	 {MixMusic Music}
 	 
@@ -370,7 +427,15 @@ local Mix Interprete Projet CWD in
 
    local 
       Joie = {Projet.load CWD#'joie.dj.oz'}
-      Music = [merge([0.2#Joie 0.8#[wave(CWD#'wave/animaux/cat.wav')]])]
+      Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
+      Part2 = [silence c4 d4]
+      Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
+      Chat = wave(CWD#'wave/animaux/cat.wav')
+
+      M = partition([a b c])
+      %Music = [repetition(nombre:3 [partition(Part2)])]
+      %Joie = [partition([a b c])]
+      Music = [repetition(duree:7.0 [partition([a a b b c])])]
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui démontre les fonctionalités de votre
@@ -379,6 +444,10 @@ local Mix Interprete Projet CWD in
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
       {Browse begin}
+
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
 end
+
+
+
