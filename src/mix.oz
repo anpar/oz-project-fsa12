@@ -20,7 +20,7 @@ fun {Mix Interprete Music}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
 	    fun {FillAux Length AudioVector}
-	       if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment nécessaire de faire un reverse pour une note?}
+	       if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment nécessaire de faire un reverse pour une note?
 	       else
 		  {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
 	       end
@@ -36,9 +36,12 @@ fun {Mix Interprete Music}
 	 local MixVoiceAux in
 	    fun {MixVoiceAux V AudioVector}
 	       case V of nil then {Flatten {Reverse AudioVector}}
-	       [] H|T then
-		  local F in
-		     F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
+	       []H|T then
+		  local F in 
+		     case H of silence(duree:D) then F=0.0
+		     else F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
+		     end
+		     
 		     {MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
 		     % FIX : on aura aussi un probleme de rapidite ici
 		     % avec la fonction Append a mon avis, il faudra tester.
@@ -47,10 +50,10 @@ fun {Mix Interprete Music}
 		     % a dire a priori {Fill F H.duree}.
 		  end
 	       end
-	    end
+	    end %MixVoiceAux
 	    {MixVoiceAux V nil}
 	 end
-      end
+      end %MixVoice
 	 
       % ================
       %      MIXAUX
@@ -99,13 +102,13 @@ fun {Interprete Partition}
 		  []  H|T then
 		     case H
 		     of muet(P) then
-			Sample=silence(duree:Duree)
+			Sample=[silence(duree:Duree)]
 			{Muet [P] Duree}
 		     [] duree(secondes:S P) then Sample={DureeTrans S [P]}
 		     [] etirer(facteur:F P) then Sample={Etirer F [P]}
 		     [] bourdon(note:N P) then Sample={Bourdon N [P]}
 		     [] transpose(demitons:DT P) then Sample={Transpose DT [P]}
-		     [] silence  then Sample=silence(duree:1.0)
+		     [] silence  then Sample=[silence(duree:1.0)]
 		     else 
 			Sample=[echantillon(hauteur:Hauteur duree:1.0 instrument:none)]
 			Hauteur={NumberOfSemiTones {ToNote H}}
@@ -310,13 +313,14 @@ local
    Projet
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
-   Result = {Interprete [etirer(facteur:0.2 [Tune End1 Tune End2 Interlude Tune End2])]}
+   %Result = {Interprete [etirer(facteur:0.2 [Tune End1 Tune End2 Interlude Tune End2])]}
    %Result = {Interprete [a a#4 b c c#4 d d#4 e f f#4 g g#4 etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]}
    %Result = {Interprete [muet([a b]) duree(secondes:9 [a b c silence])]} %
    %Result = {Interprete [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])]}
    %Result = {Interprete [muet(a) duree(secondes:4.0 a) etirer(facteur:3.0 a) bourdon(note:d a) transpose(demitons:1 a)]}
-   %Result ={Interprete [a5 transpose(demitons:1 [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])])]}
-
+   Result ={Interprete [a5 transpose(demitons:1 [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])])]}
+   {Browse Result}
+   
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} %Windows Phil
    CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Mac Phil
 
