@@ -16,8 +16,19 @@ A faire :
     * Optimisation : done
 * Fonctions Mix
     * Fill : done
-    * MixVoice :
-    * MixWave :
+    * MixVoice : done
+    * MixWave : done
     * Filtres :
-    * Merge :
+        * renverser : done
+        * repetition : done
+        * echo : done
+        * clip : done
+        * fondu : done
+        * fondu_enchaine : done
+        * couper
+    * Merge : done
 * Extensions
+    * Lissage
+    * Instruments
+    * Créativité
+    * Effets complexes
