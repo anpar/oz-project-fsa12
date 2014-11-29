@@ -290,7 +290,7 @@ define
       try
          {ReadWaveFileHelper Name}
       catch E then
-         case E of error(_) then raise E end
+         case E of error(_) then raise E end]
          else raise E end
          end
       end

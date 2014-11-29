@@ -20,7 +20,7 @@ fun {Mix Interprete Music}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
 	    fun {FillAux Length AudioVector}
-	       if Length >= DesiredLength then {Reverse AudioVector}
+	       if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment n�cessaire de faire un reverse pour une note?}
 	       else
 		  {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.1415*F*Length)/44100.0})] AudioVector}}
 	       end
@@ -35,11 +35,11 @@ fun {Mix Interprete Music}
       fun {MixVoice V}
 	 local MixVoiceAux in
 	    fun {MixVoiceAux V AudioVector}
-	       case V of nil then {Reverse AudioVector}
+	       case V of nil then {Flatten {Reverse AudioVector}}
 	       [] H|T then
 		  local F in
 		     F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
-		     {MixVoiceAux T {Append {Fill F H.duree} AudioVector}}
+		     {MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
 		     % FIX : on aura aussi un probleme de rapidite ici
 		     % avec la fonction Append a mon avis, il faudra tester.
 		     % Cependant je ne vois pas comment on pourrait regler le probleme ici...
@@ -56,10 +56,10 @@ fun {Mix Interprete Music}
       %      MIXAUX
       % ================
       fun {MixAux Music AudioVector}
-	 case Music of nil then AudioVector
+	 case Music of nil then {Flatten {Reverse AudioVector}}
 	 [] H|T then
-	    case H of voix(V) then {MixAux T {MixVoice V}|AudioVector}
-	    [] partition(P) then {MixAux T {Append AudioVector {MixVoice {Interprete P}}}}
+	    case H of voix(V) then {MixAux T {Append AudioVector [{MixVoice V}]}}
+	    [] partition(P) then {MixAux T {Append AudioVector [{MixVoice {Interprete P}}]}}
 	    [] wave(F) then todo
 	    [] merge(M) then todo
 	    else % Cas des filtres
@@ -299,18 +299,18 @@ end
 
 % TEST ZONE
 local
-   Tune = [b b c d d c b a g g a b]
+   Tune = [b b c5 d5 d5 c5 b a g g a b]
    End1 = [etirer(facteur:1.5 b) etirer(facteur:0.5 a) etirer(facteur:2.0 a)]
    End2 = [etirer(facteur:1.5 a) etirer(facteur:0.5 g) etirer(facteur:2.0 g)]
-   Interlude = [a a b g a etirer(facteur:0.5 [b c#5])
-		b g a etirer(facteur:0.5 [b c#5])
+   Interlude = [a a b g a etirer(facteur:0.5 [b c5])
+		b g a etirer(facteur:0.5 [b c5])
 		b a g a etirer(facteur:2.0 d) ]
    Result
    CWD
    Projet
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
-   Result = {Interprete [Tune]}% End1 Tune End2 Interlude Tune End2]}
+   Result = {Interprete [etirer(facteur:0.2 [Tune End1 Tune End2 Interlude Tune End2])]}
    %Result = {Interprete [a a#4 b c c#4 d d#4 e f f#4 g g#4 etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]}
    %Result = {Interprete [muet([a b]) duree(secondes:9 [a b c silence])]} %
    %Result = {Interprete [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])]}
@@ -318,19 +318,17 @@ in
    %Result ={Interprete [a5 transpose(demitons:1 [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])])]}
    %{Browse Result}
 
-  % CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Change ;)
-
-   %Macintosh HD/Users/Philippe ▸ Desktop ▸ oz-project-fsa12
+   CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'}
 
    % For windows
-   %[Projet] = {Link ['C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
-   %{Browse {Projet.writeFile 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
+   [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
+   {Browse {Projet.writeFile CWD#'out.wav' {Mix Interprete [voix(Result)]}}}
 
    % For mac
-   [Projet] = {Link ['/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
-   {Browse Result}
-   {Browse {Mix Interprete [voix(Result)]}}
-   {Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [voix(Result)]}}}
+   %[Projet] = {Link ['/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
+   %{Browse Result}
+   %{Browse {Mix Interprete [voix(Result)]}}
+   %{Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [voix(Result)]}}}
 
 end
 
