@@ -316,19 +316,13 @@ in
    %Result = {Interprete [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])]}
    %Result = {Interprete [muet(a) duree(secondes:4.0 a) etirer(facteur:3.0 a) bourdon(note:d a) transpose(demitons:1 a)]}
    %Result ={Interprete [a5 transpose(demitons:1 [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])])]}
-   %{Browse Result}
 
-   CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'}
+   %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} %Windows Phil
+   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Mac Phil
 
-   % For windows
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
    {Browse {Projet.writeFile CWD#'out.wav' {Mix Interprete [voix(Result)]}}}
 
-   % For mac
-   %[Projet] = {Link ['/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
-   %{Browse Result}
-   %{Browse {Mix Interprete [voix(Result)]}}
-   %{Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [voix(Result)]}}}
 
 end
 
