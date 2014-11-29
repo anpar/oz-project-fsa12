@@ -4,8 +4,9 @@ local Mix Interprete Projet CWD in
    % modifiez sa valeur pour correspondre à votre système.
 
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Mac Phil
-
+   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} %Mac Phil
+   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   
    % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
    % [Projet] = {Link ['Projet2014_mozart1.4.ozf']}
    %
@@ -94,7 +95,7 @@ local Mix Interprete Projet CWD in
 		     [] repetition(nombre:N M) then NewAV = {RepetitionNB N {MixMusic M}}
 		     [] repetition(duree:D M) then NewAV = {RepetitionDuree D {MixMusic M}}
 		     [] clip(bas:Bas haut:Haut M) then NewAV = {Clip Bas Haut {MixMusic M}}
-		     [] echo(delai:S M) then NewAV = {Merge [0.5#[partition([a])] 0.5#[voix([silence(duree:1.0)]) partition([a]) ]]}
+		     [] echo(delai:S M) then NewAV = {Merge [0.5#[M] 0.5#[voix([silence(duree:S)]) M]]}
 		     [] echo(delai:S decadence:F M) then  NewAV = nil
 		     [] echo(delai:S decadence:F repetition:N M) then NewAV = nil
 		     [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = nil
@@ -435,7 +436,7 @@ local Mix Interprete Projet CWD in
       M = partition([a b c])
       %Music = [repetition(nombre:3 [partition(Part2)])]
       %Joie = [partition([a b c])]
-      Music = [echo(delai:1.0 [partition([a a b b c])])]
+      Music = [echo(delai:1.0 partition([a a b b c]))]
       %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
@@ -445,7 +446,6 @@ local Mix Interprete Projet CWD in
       % Si votre code devait ne pas passer nos tests, cet exemple serait le
       % seul qui ateste de la validité de votre implémentation.
       {Browse begin}
-
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
 end
