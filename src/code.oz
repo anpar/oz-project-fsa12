@@ -88,8 +88,18 @@ local Mix Interprete Projet CWD in
 		     [] partition(P) then {MixMusicAux T {Append AudioVector [{MixVoice {Interprete P}}]}}
 		     [] wave(F) then {MixMusicAux T {Append AudioVector [{Projet.readFile F}]}}
 		     [] merge(M) then {MixMusicAux T {Append AudioVector [{Merge M}]}}
-		     else % Cas des filtres
-			todo
+		     [] renverser(M) then todo
+		     [] repetition(nombre:N M) then todo
+		     [] repetition(duree:D M) then todo
+		     [] clip(bas:Bas haut:Haut M) then todo
+		     [] echo(delai:S M) then todo
+		     [] echo(delai:S decadence:F M) then todo
+		     [] echo(delai:S decadence:F repetition:N M) then todo
+		     [] fondu(ouverture:S1 fermeture:S2 M) then todo
+		     [] fondu_enchaine(duree:S M1 M2) then todo
+		     [] couper(debut:S1 fin:S2 M) then todo
+		     else 
+			errormatching
 		     end
 		  end   
 	       end %MixMusicAux
