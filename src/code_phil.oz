@@ -121,13 +121,13 @@ local Mix Interprete Projet CWD in
 	    fun {FonduAux ActualPlace AV Acc}
 	       case AV of nil then {Reverse Acc}
 	       [] H|T then
-		  if  ActualPlace < OuvertureAux andthen ActualPlace > Leng-FermetureAux
+		  if  ActualPlace < OuvertureAux andthen ActualPlace > Leng-FermetureAux then
 		     {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)*((Leng-ActualPlace)/(FermetureAux))|Acc}
 		  elseif ActualPlace < OuvertureAux then
 		     {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)|Acc}
 		  elseif ActualPlace > Leng-FermetureAux then 
 		     {FonduAux ActualPlace+1.0 T H*((Leng-ActualPlace)/(FermetureAux))|Acc}
-		  else  {FonduAux ActualPlace+1.0 T H|Acc}
+		  else {FonduAux ActualPlace+1.0 T H|Acc}
 		  end
 	       end
 	    end
@@ -540,6 +540,3 @@ local Mix Interprete Projet CWD in
       {Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
    end
 end
-
-
-
