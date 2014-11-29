@@ -58,15 +58,10 @@ fun {Mix Interprete Music}
       fun {MixAux Music AudioVector}
 	 case Music of nil then AudioVector
 	 [] H|T then
-	    case H of voix(V) then
-	       {MixAux T {MixVoice V}|AudioVector}
-	    [] partition(P) then
-	       {MixAux T {Append AudioVector {MixVoice {Interprete P}}}}
-
-	    [] wave(F) then
-	       todo
-	    [] merge(M) then
-	       todo
+	    case H of voix(V) then {MixAux T {MixVoice V}|AudioVector}
+	    [] partition(P) then {MixAux T {Append AudioVector {MixVoice {Interprete P}}}}
+	    [] wave(F) then todo
+	    [] merge(M) then todo
 	    else % Cas des filtres
 	       todo
 	    end
@@ -315,7 +310,7 @@ local
    Projet
 in
    %Result = {Interprete [etirer(facteur:3 a)  a b silence muet([a b c d muet([a b c d])])]}
-   Result = {Interprete [Tune End1 Tune End2 Interlude Tune End2]}
+   Result = {Interprete [Tune]}% End1 Tune End2 Interlude Tune End2]}
    %Result = {Interprete [a a#4 b c c#4 d d#4 e f f#4 g g#4 etirer(facteur:3 [a b e1 silence]) a4 b e2 c#2]}
    %Result = {Interprete [muet([a b]) duree(secondes:9 [a b c silence])]} %
    %Result = {Interprete [muet([a b c]) duree(secondes:4.0 [a b c]) etirer(facteur:3.0 [a b c]) bourdon(note:d [a b c]) transpose(demitons:1 [a b c])]}
@@ -333,9 +328,9 @@ in
 
    % For mac
    [Projet] = {Link ['/Users/Philippe/Desktop/oz-project-fsa12/src/Projet2014_mozart2.ozf']}
-   {Browse Projet}
-   {Browse Projet.hz}
-   {Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [partition([a a c c d b]) partition([e e e])]}}}
+   {Browse Result}
+   {Browse {Mix Interprete [voix(Result)]}}
+   {Browse {Projet.writeFile '/Users/Philippe/Desktop/oz-project-fsa12/src/out.wav' {Mix Interprete [voix(Result)]}}}
 
 end
 
