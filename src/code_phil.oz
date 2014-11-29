@@ -94,7 +94,7 @@ local Mix Interprete Projet CWD in
 		     [] repetition(nombre:N M) then NewAV = {RepetitionNB N {MixMusic M}}
 		     [] repetition(duree:D M) then NewAV = {RepetitionDuree D {MixMusic M}}
 		     [] clip(bas:Bas haut:Haut M) then NewAV = {Clip Bas Haut {MixMusic M}}
-		     [] echo(delai:S M) then NewAV = nil
+		     [] echo(delai:S M) then NewAV = {Merge [0.5#[partition([a])] 0.5#[voix([silence(duree:1.0)]) partition([a]) ]]}
 		     [] echo(delai:S decadence:F M) then  NewAV = nil
 		     [] echo(delai:S decadence:F repetition:N M) then NewAV = nil
 		     [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = nil
@@ -103,7 +103,7 @@ local Mix Interprete Projet CWD in
 		     else 
 			NewAV = errormatching
 		     end
-		     {MixMusicAux T {Append AudioVector [NewAV]}}
+		     {MixMusicAux T {Append [NewAV] AudioVector}}
 		  end   
 	       end %MixMusicAux
 	       {MixMusicAux Music nil}
@@ -435,7 +435,8 @@ local Mix Interprete Projet CWD in
       M = partition([a b c])
       %Music = [repetition(nombre:3 [partition(Part2)])]
       %Joie = [partition([a b c])]
-      Music = [repetition(duree:7.0 [partition([a a b b c])])]
+      Music = [echo(delai:1.0 [partition([a a b b c])])]
+      %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois.  Lors de cet appel,
       % vous devez mixer une musique qui démontre les fonctionalités de votre
