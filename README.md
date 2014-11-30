@@ -28,7 +28,7 @@ A faire :
         * couper : done
     * Merge : done
 * Extensions
-    * Lissage
+    * Lissage : done
     * Instruments
     * Créativité
     * Effets complexes
