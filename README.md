@@ -30,5 +30,8 @@ A faire :
 * Extensions
     * Lissage : done
     * Instruments
+       * Changer l'instrument dans un échantillon : done
+       * Charger le vecteur audio correspondant à l'instrument et à la note : done
+       * Couper/Fondu du vecteur audio pour qu'il correspondent à la durée de la note
     * Créativité
     * Effets complexes
