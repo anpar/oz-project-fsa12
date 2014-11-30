@@ -35,18 +35,56 @@ local Mix Interprete Projet CWD in
 	 local MixVoiceAux in
 	    fun {MixVoiceAux V AudioVector}
 	       case V of nil then {Flatten {Reverse AudioVector}}
-	       []H|T then
-		  local F in 
-		     case H of silence(duree:D) then F=0.0
-		     else F = {Pow 2.0 ({IntToFloat H.hauteur}/12.0)} * 440.0
+	       [] H|T then
+		  local F Note File in
+		     case H of silence(duree:D) then
+			F = 0.0
+			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+		     [] echantillon(duree:D hauteur:Ht instrument:none) then
+			F = {Pow 2.0 ({IntToFloat Ht}/12.0)} * 440.0
+			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+		     [] echantillon(duree:D hauteur:Ht instrument:I) then
+			Note = {HauteurToNote Ht}
+			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			{MixVoiceAux T {Append [File] AudioVector}}
 		     end
-		     {MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
 		  end
 	       end
 	    end 
 	    {MixVoiceAux V nil}
 	 end
-      end 
+      end
+
+      % ===============
+      %  HAUTEURTONOTE
+      % ===============
+      % INPUT : une hauteur (entier)
+      % OUTPUT : une note (atom)
+      % Remarque : renvoie e1 et 'a#4' (avec et sans guillemets) selon
+      % qu'il y ait une alteration ou pas, a voir si cela pose un probleme.
+      fun {HauteurToNote Hauteur}
+	 local Octave DeltaNote in
+	    Octave = 4 + ((Hauteur-2) div 12)
+	    DeltaNote = Hauteur - ((Hauteur div 12)*12)
+	    {VirtualString.toAtom {NumberToNote (10+DeltaNote)}#Octave}
+	 end
+      end
+      
+      fun {NumberToNote Number}
+	 case Number of 1 then "c"
+	 [] 2 then "c#"
+	 [] 3 then "d"
+	 [] 4 then "d#"
+	 [] 5 then "e"
+	 [] 6 then "f"
+	 [] 7 then "f#"
+	 [] 8 then "g"
+	 [] 9 then "g#"
+	 [] 10 then "a"
+	 [] 11 then "a#"
+	 [] 12 then "b"
+	 end
+      end
 	 
       % ================
       %     MIXMUSIC
@@ -374,16 +412,18 @@ local Mix Interprete Projet CWD in
 		  case H of instrument(nom:I2 P2) then
 		     {InstrumentAux I T {Append Acc {InstrumentAux I2 [P2] nil}}}
 		  else
-		     {InstrumentAux I T {Append Acc {InstrumentSimplestCase I {InterpreteFlattened [H]}}}}
+		     {InstrumentAux I T {Append Acc {InstrumentSimplestCase I {InterpreteFlattened [H]} nil}}}
 		  end
 	       end
 	    end
 
 	    % On s'occupe du cas le plus simple à savoir instrument(nom:<atom> <note>)
-	    fun {InstrumentSimplestCase I E}
-	       case {Flatten E} of nil then nil
-	       [] silence(duree:D) then [silence(duree:D)]
-	       else [echantillon(hauteur:E.1.hauteur duree:E.1.duree instrument:I)]
+	    fun {InstrumentSimplestCase I V Acc}
+	       case {Flatten V} of nil then Acc
+	       [] H|T then
+		  case H of silence(duree:D) then {InstrumentSimplestCase I T {Append Acc [silence(duree:D)]}}
+		  else {InstrumentSimplestCase I T {Append Acc [echantillon(hauteur:H.hauteur duree:H.duree instrument:I)]}}
+		  end
 	       end
 	    end
 	    {InstrumentAux Instrument Part nil}
@@ -568,7 +608,7 @@ end
    % +++++++++++++++++++++++++++++
    % +        TEST ZONE          +
    % +++++++++++++++++++++++++++++
-local 
+   local 
    Joie = {Projet.load CWD#'joie.dj.oz'}
    Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
    Part2 = [silence c4 d4]
@@ -581,6 +621,10 @@ local
    Part9 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute a4)])])]
    Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
    Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
+   Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
+   Tune = [partition([instrument(nom:bziaou [b b c4 d4 d4 c4 b a g g a b])])]
+   % Probleme lorsqu'on melange instrument et facteur apparement, il ne garde
+   % que la premiere note (a4 pour cet exemple)
    Chat = wave(CWD#'wave/animaux/cat.wav')
    M = partition([a b c])
       
@@ -590,9 +634,10 @@ local
    %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
    %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
    Music = Joie
+   % Remarque : appliquer un instrument à Joie en entier semble prendre beaucoup trop de temps (ou ne pas fonctionner)
+   % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
 in
-   %{Browse begin}
-   %{Browse {Projet.run Mix Interprete Music CWD#'out.wav'}}
-   {Browse {Interprete [Part10]}}
+   {Browse begin}
+   {Browse {Projet.run Mix Interprete Tune CWD#'out.wav'}}
 end
 end

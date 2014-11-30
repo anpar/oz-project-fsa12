@@ -13,4 +13,3 @@ in
    % Ceci est une musique :-)
    [partition(Partition)]
 end
-
