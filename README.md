@@ -18,14 +18,14 @@ A faire :
     * Fill : done
     * MixVoice : done
     * MixWave : done
-    * Filtres :
+    * Filtres : done
         * renverser : done
         * repetition : done
         * echo : done
         * clip : done
         * fondu : done
         * fondu_enchaine : done
-        * couper
+        * couper : done
     * Merge : done
 * Extensions
     * Lissage
