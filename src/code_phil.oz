@@ -4,8 +4,8 @@ local Mix Interprete Projet CWD in
    % modifiez sa valeur pour correspondre a votre systeme.
 
    % CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   % CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+    CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    
    % Si vous utilisez Mozart 1.4, remplacez la ligne précédente par celle-ci :
    % [Projet] = {Link ['Projet2014_mozart1.4.ozf']}
@@ -100,7 +100,7 @@ local Mix Interprete Projet CWD in
 		     [] echo(delai:S decadence:D repetition:N M) then NewAV = {Merge {Echo S D N M}}
 		     [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = {Fondu S1 S2 {MixMusic M}}
 		     [] fondu_enchaine(duree:S M1 M2) then NewAV = {FonduEnchaine S {MixMusic M1} {MixMusic M2}}
-		     [] couper(debut:S1 fin:S2 M) then  NewAV = nil
+		     [] couper(debut:S1 fin:S2 M) then  NewAV = {Couper S1 S2 {MixMusic M}}
 		     else 
 			NewAV = errormatching
 		     end
@@ -286,6 +286,26 @@ local Mix Interprete Projet CWD in
 	 in
 	    {Append {RepetitionNB NB AV} {FillEnd Remaining AV nil}}
 	 end
+
+	 
+	 fun {Couper Begin End AV}
+	    BeginAux=Begin*44100.0
+	    EndAux=End*44100.0
+	    Leng={IntToFloat {Length AV}}
+	    fun {CouperAux AV ActualPlace Acc}
+	       case AV of nil then {Reverse Acc}
+	       []H|T then
+		  if ActualPlace < BeginAux then {CouperAux T ActualPlace+1.0 0.0|Acc}
+		  elseif ActualPlace > Leng-EndAux then {CouperAux T ActualPlace+1.0 0.0|Acc}
+		  else
+		     {CouperAux T ActualPlace+1.0 H|Acc}
+		  end
+	       end
+	    end
+	 in
+	    {CouperAux AV 0.0 nil}
+	 end
+	 
 
 	 % FIN DES DEFINITIONS DE FONCTIONS AUXILIAIRES
       in
@@ -526,7 +546,7 @@ local Mix Interprete Projet CWD in
       M = partition([a b c])
       %Music = [repetition(nombre:3 [partition(Part2)])]
       %Joie = [partition([a b c])]
-      Music = [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])]
+      Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
       %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
       %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
    in
