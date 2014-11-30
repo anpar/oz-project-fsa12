@@ -43,9 +43,9 @@ local Mix Interprete Projet CWD in
 	    local FillAux DesiredLength in
 	       DesiredLength = 44100.0*Duree
 	       fun {FillAux Length AudioVector}
-		  if Length >= DesiredLength then {Reverse AudioVector} % est-ce vraiment necessaire de faire un reverse pour une note?
+		  if Length >= DesiredLength then {Lissage {Reverse AudioVector} DesiredLength} % est-ce vraiment necessaire de faire un reverse pour une note?
 		  else
-		     {FillAux Length+1.0 {Append [(0.5*{Sin (2.0*3.14159*F*Length)/44100.0})] AudioVector}}
+		     {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVector}}
 		  end
 	       end
 	       {FillAux 0.0 nil}
@@ -305,6 +305,34 @@ local Mix Interprete Projet CWD in
 	 in
 	    {CouperAux AV 0.0 nil}
 	 end
+
+	 fun {Lissage AV Duree}
+	    Attack=0.1*Duree
+	    Height1=1.0
+	    Decay=0.15*Duree
+	    Height2=0.9
+	    Sustain=0.85*Duree
+	    Release=Duree
+	    fun {LissageAux AV ActualPosition Acc}
+	       case AV of nil then {Reverse Acc}
+	       []H|T then
+		  if ActualPosition < Attack then {LissageAux T ActualPosition+1.0 H*(ActualPosition/Attack)|Acc}
+		  elseif ActualPosition < Decay then
+		     Coef= ((Height2-Height1)*(ActualPosition-Attack)/(Decay-Attack))+Height1
+		  in
+		     {LissageAux T ActualPosition+1.0 H*Coef|Acc}
+		  elseif ActualPosition < Sustain then {LissageAux T ActualPosition+1.0 H*Height2|Acc}
+		  else
+		     Coef= ((0.0-Height2)*(ActualPosition-Sustain)/(Release-Sustain))+Height2
+		  in
+		     {LissageAux T ActualPosition+1.0 H*Coef|Acc}
+		  end
+	       end
+	    end	    	     
+	 in
+	    {LissageAux AV 0.0 nil}
+	 end
+	 
 	 
 
 	 % FIN DES DEFINITIONS DE FONCTIONS AUXILIAIRES
@@ -546,9 +574,10 @@ local Mix Interprete Projet CWD in
       M = partition([a b c])
       %Music = [repetition(nombre:3 [partition(Part2)])]
       %Joie = [partition([a b c])]
-      Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
+      %Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
       %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
       %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
+      Music = [M]
    in
       % Votre code DOIT appeler Projet.run UNE SEULE fois. Lors de cet appel,
       % vous devez mixer une musique qui demontre les fonctionalites de votre
