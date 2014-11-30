@@ -47,6 +47,7 @@ local Mix Interprete Projet CWD in
 			Note = {HauteurToNote Ht}
 			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
 			{MixVoiceAux T {Append [File] AudioVector}}
+			% FIX : ça ne fonctionne pas quand j'essayer d'appliquer {Couper 0.0 D [File]}
 		     end
 		  end
 	       end
@@ -60,8 +61,7 @@ local Mix Interprete Projet CWD in
       % ===============
       % INPUT : une hauteur (entier)
       % OUTPUT : une note (atom)
-      % Remarque : renvoie e1 et 'a#4' (avec et sans guillemets) selon
-      % qu'il y ait une alteration ou pas, a voir si cela pose un probleme.
+      % FIX : semble ne pas fonctionner pour les notes d'octaves > 4, a regler
       fun {HauteurToNote Hauteur}
 	 local Octave DeltaNote in
 	    Octave = 4 + ((Hauteur-2) div 12)
@@ -622,9 +622,8 @@ end
    Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
    Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
    Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
-   Tune = [partition([instrument(nom:bziaou [b b c4 d4 d4 c4 b a g g a b])])]
-   % Probleme lorsqu'on melange instrument et facteur apparement, il ne garde
-   % que la premiere note (a4 pour cet exemple)
+   Tune = [partition([instrument(nom:woody [b b c4 d4 d4 c4 b a g g a b])])]
+   % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
    Chat = wave(CWD#'wave/animaux/cat.wav')
    M = partition([a b c])
       
