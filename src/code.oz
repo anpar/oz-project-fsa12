@@ -304,18 +304,24 @@ local Mix Interprete Projet CWD in
 	 BeginAux=Begin*44100.0
 	 EndAux=End*44100.0
 	 Leng={IntToFloat {Length AV}}
+	 BginPlace
 	 fun {CouperAux AV ActualPlace Acc}
-	    case AV of nil then {Reverse Acc}
-	    []H|T then
-	       if ActualPlace < BeginAux then {CouperAux T ActualPlace+1.0 0.0|Acc}
-	       elseif ActualPlace > Leng-EndAux then {CouperAux T ActualPlace+1.0 0.0|Acc}
-	       else
-		  {CouperAux T ActualPlace+1.0 H|Acc}
-	       end
+	    if ActualPlace < 0.0 then {CouperAux AV ActualPlace+1.0 0.0|Acc}
+	    elseif AV.1 == nil andthen ActualPlace < EndAux then {CouperAux nil ActualPlace+1.0 0.0|Acc}
+	    elseif ActualPlace < BeginAux then {CouperAux AV.2 ActualPlace+1.0 0.0|Acc}
+	    elseif ActualPlace >= EndAux then {Reverse Acc}
+	    else
+	       {CouperAux T ActualPlace+1.0 H|Acc}
 	    end
+	    
 	 end
       in
-	 {CouperAux AV 0.0 nil}
+	 if BeginAux < 0 then BeginPlace=BeginAux
+	 else
+	    BeginPlace=0.0
+	 end
+	 
+	 {CouperAux AV BeginPlace nil}
       end
 
       % ================
