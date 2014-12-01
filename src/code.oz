@@ -1,7 +1,7 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
    % +++++++++++++++++++++++++++++++++++++++++
    % +                MIX                    +
@@ -36,7 +36,7 @@ local Mix Interprete Projet CWD in
 	    fun {MixVoiceAux V AudioVector}
 	       case V of nil then {Flatten {Reverse AudioVector}}
 	       [] H|T then
-		  local F Note File in
+		  local F Note File F1 F2 in
 		     case H of silence(duree:D) then
 			F = 0.0
 			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
@@ -46,8 +46,17 @@ local Mix Interprete Projet CWD in
 		     [] echantillon(duree:D hauteur:Ht instrument:I) then
 			Note = {HauteurToNote Ht}
 			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
-			{MixVoiceAux T {Append [File] AudioVector}}
+			%{Browse [File]}
+			%{Browse	{Couper 0.0 D [File]}}
+			%{MixVoiceAux T {Append [{Lissage {Couper 0.0 D File} D*44100.0}] AudioVector}}
 			% FIX : ça ne fonctionne pas quand j'essayer d'appliquer {Couper 0.0 D [File]}
+			%{MixVoiceAux T {Append [{Couper 0.0 D File}] AudioVector}}
+			
+			F1 = {Couper 0.001 0.021 File}
+			F2 = {Reverse F1}
+			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}] AudioVector}}
+
+
 		     end
 		  end
 	       end
@@ -308,20 +317,19 @@ local Mix Interprete Projet CWD in
       fun {Couper Begin End AV}
 	 BeginAux=Begin*44100.0
 	 EndAux=End*44100.0
-	 Leng={IntToFloat {Length AV}}
-	 BginPlace
+	 BeginPlace
 	 fun {CouperAux AV ActualPlace Acc}
 	    if ActualPlace < 0.0 then {CouperAux AV ActualPlace+1.0 0.0|Acc}
-	    elseif AV.1 == nil andthen ActualPlace < EndAux then {CouperAux nil ActualPlace+1.0 0.0|Acc}
+	    elseif AV == nil andthen ActualPlace < EndAux then {CouperAux nil ActualPlace+1.0 0.0|Acc}
 	    elseif ActualPlace < BeginAux then {CouperAux AV.2 ActualPlace+1.0 0.0|Acc}
 	    elseif ActualPlace >= EndAux then {Reverse Acc}
 	    else
-	       {CouperAux T ActualPlace+1.0 H|Acc}
+	       {CouperAux AV.2 ActualPlace+1.0 AV.1|Acc}
 	    end
 	    
 	 end
       in
-	 if BeginAux < 0 then BeginPlace=BeginAux
+	 if BeginAux < 0.0 then BeginPlace=BeginAux
 	 else
 	    BeginPlace=0.0
 	 end
@@ -633,7 +641,7 @@ end
    Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
    Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
    Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
-   Tune = [partition([instrument(nom:woody [b b c4 d4 d4 c4 b a g g a b])])]
+   Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
    % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
    Chat = wave(CWD#'wave/animaux/cat.wav')
    M = partition([a b c])
@@ -648,6 +656,6 @@ end
    % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
 in
    {Browse begin}
-   {Browse {Projet.run Mix Interprete Tune CWD#'out.wav'}}
+   {Browse {Projet.run Mix Interprete Joie CWD#'out.wav'}}
 end
 end
