@@ -412,32 +412,7 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
-         % ================
-         %    INSTRUMENT
-         % ================
-         % INPUT : une partition (liste) brute et un instrument (atom)
-         % OUTPUT : une voix, c'est a dire une liste d'echantillon dont
-         % l'instrument sera mis a I
-	 fun {Instrument InstrumentAtom Part}
-	    local Echantillon InstrumentAux in
-               % On va parcourir un a un les elements de la partition de laquelle on
-               % veut changer l'instrument. On stocke dans l'accumulateur le resultat
-               % de ce changement, c'est a dire la voix modifie.
-	       fun {InstrumentAux Voice Acc}
-		  case Voice of nil then {Reverse Acc}
-		  [] H|T then
-		     case H of silence(duree:D) then {InstrumentAux T silence(duree:D)|Acc}
-		     []echantillon(hauteur:Hauteur duree:D instrument:none)
-		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:InstrumentAtom)|Acc}
-		     []echantillon(hauteur:Hauteur duree:D instrument:I)
-		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:I)|Acc}
-		     end
-		  end
-	       end
-
-	       {InstrumentAux {Interprete Part} nil}
-	    end
-	 end
+	 %+++++Fonctions de transformation+++++
 	 
          % ================
          %    DUREETRANS
@@ -464,6 +439,7 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
+	 
          % ================
          %      ETIRER
          % ================
@@ -487,6 +463,7 @@ local Mix Interprete Projet CWD in
 	    end 
 	 end 
 
+	 
          % ================
          %     BOURDON
          % ================
@@ -515,6 +492,7 @@ local Mix Interprete Projet CWD in
 	    end 
 	 end 
 
+	 
          % ================
          %    TRANSPOSE
          % ================
@@ -538,6 +516,35 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
+	 
+         % ================
+         %    INSTRUMENT
+         % ================
+         % INPUT : une partition (liste) brute et un instrument (atom)
+         % OUTPUT : une voix, c'est a dire une liste d'echantillon dont
+         % l'instrument sera mis a I, si les echantillons n'ont pas
+	 % encore d'instrument
+	 fun {Instrument InstrumentAtom Part}
+	    local Echantillon InstrumentAux in
+	       fun {InstrumentAux Voice Acc}
+		  case Voice of nil then {Reverse Acc}
+		  [] H|T then
+		     case H of silence(duree:D) then {InstrumentAux T silence(duree:D)|Acc}
+		     []echantillon(hauteur:Hauteur duree:D instrument:none)
+		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:InstrumentAtom)|Acc}
+		     []echantillon(hauteur:Hauteur duree:D instrument:I)
+		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:I)|Acc}
+		     end
+		  end
+	       end
+
+	       {InstrumentAux {Interprete Part} nil}
+	    end
+	 end
+
+
+	 %+++++Fonctions secondaires+++++
+	 
          % ================
          %  VOICEDURATION
          % ================
@@ -554,6 +561,7 @@ local Mix Interprete Projet CWD in
 	    end 
 	 end
 
+	 
          % =================
          % NUMBEROFSEMITONES
          % =================
