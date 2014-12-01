@@ -7,6 +7,7 @@ A faire :
 ---------
 Rapport:
 * Expliquer la subtilité avec Append
+* Expliquer la subtilité avec les Reverse sur des listes de listes
 
 
 
