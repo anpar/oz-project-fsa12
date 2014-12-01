@@ -20,8 +20,8 @@ local Mix Interprete Projet CWD in
       % OUTPUT : un vecteur audio (liste de float compris entre -1.0 et 1.0)
       fun {MixMusic Music}
 	 local MixMusicAux in
-	    fun {MixMusicAux Music AudioVector}
-	       case Music of nil then {Flatten {Reverse AudioVector}}
+	    fun {MixMusicAux Music AudioVectorAcc}
+	       case Music of nil then {Flatten {Reverse AudioVectorAcc}}
 	       [] H|T then
 		  NewAV
 	       in
@@ -47,7 +47,7 @@ local Mix Interprete Projet CWD in
 		  else 
 		     NewAV = errormatching
 		  end
-		  {MixMusicAux T {Append [NewAV] AudioVector}}
+		  {MixMusicAux T {Append [NewAV] AudioVectorAcc}}
 	       end   
 	    end 
 	    {MixMusicAux Music nil}
@@ -65,16 +65,16 @@ local Mix Interprete Projet CWD in
       % OUTPUT : un vecteur audio
       fun {MixVoice V}
 	 local MixVoiceAux in
-	    fun {MixVoiceAux V AudioVector}
-	       case V of nil then {Flatten {Reverse AudioVector}}
+	    fun {MixVoiceAux V AudioVectorAcc}
+	       case V of nil then {Flatten {Reverse AudioVectorAcc}}
 	       [] H|T then
 		  local F Note File F1 F2 in
 		     case H of silence(duree:D) then
 			F = 0.0
-			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+			{MixVoiceAux T {Append [{Fill F D}] AudioVectorAcc}}
 		     [] echantillon(duree:D hauteur:Ht instrument:none) then
 			F = {Pow 2.0 ({IntToFloat Ht}/12.0)} * 440.0
-			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+			{MixVoiceAux T {Append [{Fill F D}] AudioVectorAcc}}
 		     [] echantillon(duree:D hauteur:Ht instrument:I) then
 			Note = {HauteurToNote Ht}
 			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
@@ -84,9 +84,10 @@ local Mix Interprete Projet CWD in
 			% FIX : ça ne fonctionne pas quand j'essayer d'appliquer {Couper 0.0 D [File]}
 			%{MixVoiceAux T {Append [{Couper 0.0 D File}] AudioVector}}
 			
-			F1 = {Couper 0.001 0.021 File}
-			F2 = {Reverse F1}
-			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}] AudioVector}}
+			%F1 = {Couper 0.001 0.021 File}
+			%F2 = {Reverse F1}
+			%{MixVoiceAux T {Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}|AudioVectorAcc}
+			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D File} D*44100.0}] AudioVectorAcc}}
 			
 		     end
 		  end
@@ -105,10 +106,10 @@ local Mix Interprete Projet CWD in
       fun {Fill F Duree}
 	 local FillAux DesiredLength in
 	    DesiredLength = 44100.0*Duree
-	    fun {FillAux Length AudioVector}
-	       if Length >= DesiredLength then {Lissage {Reverse AudioVector} DesiredLength}
+	    fun {FillAux Length AudioVectorAcc}
+	       if Length >= DesiredLength then {Lissage AudioVectorAcc DesiredLength}
 	       else
-		  {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVector}}
+		  {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVectorAcc}}
 	       end
 	    end
 	    {FillAux 0.0 nil}
@@ -123,14 +124,14 @@ local Mix Interprete Projet CWD in
       % OUTPUT : un vecteur audio qui joue les musiques passee en parametre en meme temps (avec respect des intensites)
       fun {Merge MusicsWithIntensity}
 	 local MergeAux in
-	    fun {MergeAux M AudioVector}
-	       case M of nil then AudioVector
+	    fun {MergeAux M AudioVectorAcc}
+	       case M of nil then AudioVectorAcc
 	       [] H|T then
 		  case H of Intensity#NewMusic then
 		     NewAudioVector
 		  in
 		     NewAudioVector = {List.map {MixMusic NewMusic} fun{$ N} Intensity*N end}
-		     {MergeAux T {Combine AudioVector NewAudioVector}}
+		     {MergeAux T {Combine AudioVectorAcc NewAudioVector}}
 		  end
 	       end
 	    end 
@@ -162,7 +163,7 @@ local Mix Interprete Projet CWD in
       %     LISSAGE
       % ================
       % INPUT : un vecteur audio representant une note pure
-      % OUTPUT : le meme vecteur audio mais avec une enveloppe sonore du type ACSR
+      % OUTPUT : le meme vecteur audio mais avec une enveloppe sonore du type ADSR
       %          (dont les parametres sont modifiables)
       fun {Lissage AV Duree}
 	 Attack=0.1*Duree
@@ -242,9 +243,9 @@ local Mix Interprete Projet CWD in
       % OUTPUT : un vecteur audio repete autant de fois que specifie
       fun {RepetitionNB NB AV}
 	 fun {RepetitionNBAux NB Acc}
-	    if NB==0 then Acc
+	    if NB==0 then {Flatten Acc}
 	    else
-	       {RepetitionNBAux NB-1 {Append AV Acc}}
+	       {RepetitionNBAux NB-1 AV|Acc}
 	    end
 	 end
       in
@@ -450,7 +451,7 @@ local Mix Interprete Projet CWD in
 		     Duree
 		     Echantillon
 		  in
-		     case FlattenedPartition of nil then {Reverse Acc}
+		     case FlattenedPartition of nil then {Flatten {Reverse Acc}}
 		     []  H|T then
 			case H
 			of muet(P) then
@@ -465,8 +466,8 @@ local Mix Interprete Projet CWD in
 			else 
 			   Echantillon = [echantillon(hauteur:Hauteur duree:1.0 instrument:none)]
 			   Hauteur = {NumberOfSemiTones {ToNote H}}
-			end 
-			{InterpreteFlattenedAux T {Append Echantillon Acc}}
+			end
+			{InterpreteFlattenedAux T {Append [Echantillon] Acc}}
 		     end 	    
 		  end
 	       end 

@@ -1,1 +1,5 @@
 *.oz~
+*.aux
+*.log
+*.tex.bak
+*.synctex.gz

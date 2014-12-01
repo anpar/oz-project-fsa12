@@ -1,1 +1,123 @@
-% TODO
+\documentclass[12pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[top = 2.5 cm, bottom = 2.5 cm, left = 2.5 cm, right = 2.5 cm]{geometry}
+
+\author{Philippe Verbist  Antoine Paris\\3521-13-00 \ \ \ \ ????-13-00}
+\title{DJ'Oz : Rapport de projet}
+\date{4 décembre 2014}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\section{Structure du programme}
+
+Nous avons divisé, comme demandé, le programme en trois parties:
+\begin{itemize}
+\item Une fonction Interprete, qui prends une partition en paramètre et qui renvoie une liste d'échantillons;
+\item une fonction Mix, qui prend (1) une fonction qui permet d'interpréter une partition  et (2) une musique et qui renvoie un vecteur audio, sous la forme d'une liste de flottants compris dans l'intervalle [-1.0;1.0];
+\item un fichier brabanconne.dj.oz, qui contient une musique.
+\end{itemize}
+
+Les deux fonctions que nous avons créées sont écrites entièrement en programmation déclarative. Par ailleurs, nous avons essayé de rendre toutes nos sous-fonctions récursives terminales.
+
+\subsection{Fonction Interprete}
+
+\subsubsection{Sous-fonction principale}
+
+Cette fonction est codée autour de la sous-fonction fun {InterpreteFlattened FlattenedPartition}, qui parcourt la partition passée en paramètre et qui, à chaque itération, prend le premier élément de la liste, l'analyse (dans l'ordre: s'agit-il d'une transformation, d'un silence ou d'une note?) et crée un échantillon. Cet échantillon est soit obtenu immédiatement s'il s'agit d'une note ou d'un silence (cas simple), soit après l'appel d'une autre sous-fonction s'il s'agit d'une transformation - chaque transformation ayant une fonction qui lui correspond (cas complexe). Par exemple, la sous-fonction {Etirer Facteur Part} est appelée pour la transformation etirer(facteur:F P). Ceci est vrai pour toutes les transformations, sauf muet(P), pour laquelle il n'existe pas de sous-fonction {Muet Part}.
+
+\subsubsection{Sous-fonctions de transformation}
+
+Comme dit ci-dessus, il y a autant de fonctions de transformation que de transformations (sauf pour muet(P)). On retrouve donc:
+\begin{itemize}
+\item \begin{verbatim} {WantedDuration Part} \end{verbatim}
+\item \begin{verbatim} {Etirer Facteur Part} \end{verbatim}
+\item \begin{verbatim} {Bourdon Note Part} \end{verbatim}
+\item \begin{verbatim} {Transpose Demitons Part} \end{verbatim}
+\item \begin{verbatim} {Instrument InstrumentAtom Part} \end{verbatim} 
+\end{itemize}
+
+Le fonctionnement  de chacune de ces sous-fonctions suit toujours le même schéma :
+\begin{itemize}
+\item la partition passée en paramètre \verb Part  est transformée en une liste d'échantillon par un appel à \begin{verbatim} {InterpreteFlattend Partition} \end{verbatim} (la sous-fonction principale)
+\item cette liste d'échantillons est ensuite parcourue par une sous-sous-fonction, qui applique la transformation demandée sur chacun des échantillons.
+\end{itemize} 
+
+Mettre un exemple?
+
+\subsubsection{Sous-fonctions complémentaires}
+
+Pour alléger certaines tâches de nos sous-fonctions de transformation,  nous avons créé 4 sous-fonctions complémentaires, à savoir:
+\begin{itemize}
+\item {VoiceDuration ListEchantillon}
+\item {NumberOfSemiTones Note}
+\item {NameToNumber Name}
+\item {ToNote Note}\footnote{Cette fonction nous a été donnée dans l'énonce du projet. Elle a été reprise sans être modifiée.}
+\end{itemize}
+
+La seule fonction qui présente ici un réel intérêt est la fonction {NumberOfSemiTones Note}. Nous l'expliquerons un peu plus loin.
+
+\subsection{Fonction Mix}
+
+
+\subsubsection{Sous-fonction principale}
+
+
+A l'instar de la fonction Interprete, Mix est codée autour d'une sous-fonction principale: fun {MixMusic Music}, qui parcourt la musique (une liste de morceaux) passée en paramètre et qui, à chaque itération, prend le premier élément de la liste, l'analyse d'après toutes les possibilités que peut être un morceau et crée un vecteur audio. 
+De nouveau, deux cas se distinguent :
+\begin{itemize}
+\item un cas simple: le vecteur audio peut être obtenu directement à partir d'une voix, d'une partition ou d'un vecteur audio déjà existant dans un fichier .wav.
+\item un cas plus complexe, à savoir un filtre ou un merge (jouer deux musiques en même temps), qui s'applique sur un vecteur audio déjà existant. Nous appelons ces cas 'complexes' car ils peuvent chacun s'appliquer sur un nouveau morceau, qui peut lui-même être soit simple soit complexe. Il est en effet permis d'appliquer un filtre sur un filtre sur un filtre... A noter que l'extrémité d'une telle chaine est toujours un cas simple.
+\end{itemize}
+
+\subsubsection{Sous-fonctions de création de vecteur audio (cas simples)}
+
+Les 3 cas simples cités ci-dessus (voix, partition, wave)  ne nécessitent que l'utilisation de deux sous-fonctions (voix et partition reviennent au même, puisqu'il suffit d'appliquer Interprete sur partition()):
+\begin{itemize}
+\item {MixVoice Voice} (dont la méthode est donnée dans le rapport)
+\item {Projet.readFile File} (fonction donnée)
+\end{itemize}
+
+
+\subsubsection{Sous-fonctions de filtre et merge (cas complexes)}
+
+Il y a autant de sous-fonction de filtre qu'il y a de filtres possibles (sauf pour renverser):
+\begin{itemize}
+\item  {RepetitionNB NB AV}
+\item {RepetitionDuree Duree AV}
+\item {Clip Bas Haut AV}
+\item ... (la suite de la liste se déduit assez facilement, et n'est pas particulièrement intéressante)
+\end{itemize}
+
+
+
+
+\section{Décisions prises}
+
+
+
+
+
+\section{Extensions}
+
+
+
+
+
+
+\section{Pistes d'améliorations}
+
+- gestion des erreurs
+
+
+\section{Conclusion}
+
+\end{document}
