@@ -3,6 +3,8 @@ local Mix Interprete Projet CWD in
    CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
    %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
+
+   
    % +++++++++++++++++++++++++++++++++++++++++
    % +                MIX                    +
    % +++++++++++++++++++++++++++++++++++++++++
@@ -10,99 +12,12 @@ local Mix Interprete Projet CWD in
    % Retourne un unique vecteur audio, c'est a dire une liste
    % de flottants compris entre -1.0 et 1.0
    fun {Mix Interprete Music}
-      % =================
-      %        FILL
-      % =================
-      % TODO : il faudra expliquer dans le rapport la subtilite
-      % utilisee dans Append pour gagner du temps.
-      fun {Fill F Duree}
-	 local FillAux DesiredLength in
-	    DesiredLength = 44100.0*Duree
-	    fun {FillAux Length AudioVector}
-	       if Length >= DesiredLength then {Lissage {Reverse AudioVector} DesiredLength}
-	       else
-		  {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVector}}
-	       end
-	    end
-	    {FillAux 0.0 nil}
-	 end
-      end
-
-      % =================
-      %     MIXVOICE
-      % =================
-      fun {MixVoice V}
-	 local MixVoiceAux in
-	    fun {MixVoiceAux V AudioVector}
-	       case V of nil then {Flatten {Reverse AudioVector}}
-	       [] H|T then
-		  local F Note File F1 F2 in
-		     case H of silence(duree:D) then
-			F = 0.0
-			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
-		     [] echantillon(duree:D hauteur:Ht instrument:none) then
-			F = {Pow 2.0 ({IntToFloat Ht}/12.0)} * 440.0
-			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
-		     [] echantillon(duree:D hauteur:Ht instrument:I) then
-			Note = {HauteurToNote Ht}
-			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
-			%{Browse [File]}
-			%{Browse	{Couper 0.0 D [File]}}
-			%{MixVoiceAux T {Append [{Lissage {Couper 0.0 D File} D*44100.0}] AudioVector}}
-			% FIX : ça ne fonctionne pas quand j'essayer d'appliquer {Couper 0.0 D [File]}
-			%{MixVoiceAux T {Append [{Couper 0.0 D File}] AudioVector}}
-			
-			F1 = {Couper 0.001 0.021 File}
-			F2 = {Reverse F1}
-			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}] AudioVector}}
-
-
-		     end
-		  end
-	       end
-	    end 
-	    {MixVoiceAux V nil}
-	 end
-      end
-
-      % ===============
-      %  HAUTEURTONOTE
-      % ===============
-      % INPUT : une hauteur (entier)
-      % OUTPUT : une note (atom)
-      % FIX : semble ne pas fonctionner pour les notes d'octaves > 4, a regler
-      fun {HauteurToNote Hauteur}
-	 local Octave DeltaNote in
-	    if Hauteur < 0 then
-	       Octave = 4 + ((Hauteur-2) div 12)
-	       DeltaNote = Hauteur - (((Hauteur-2) div 12)*12)
-	    else
-	       Octave = 4 + ((Hauteur+9) div 12)
-	       DeltaNote = Hauteur - (((Hauteur+9) div 12)*12)
-	    end
-	    {VirtualString.toAtom {NumberToNote (10+DeltaNote)}#Octave}
-	 end
-      end
-      
-      fun {NumberToNote Number}
-	 case Number of 1 then "c"
-	 [] 2 then "c#"
-	 [] 3 then "d"
-	 [] 4 then "d#"
-	 [] 5 then "e"
-	 [] 6 then "f"
-	 [] 7 then "f#"
-	 [] 8 then "g"
-	 [] 9 then "g#"
-	 [] 10 then "a"
-	 [] 11 then "a#"
-	 [] 12 then "b"
-	 end
-      end
-	 
+       
       % ================
       %     MIXMUSIC
       % ================
+      % INPUT : une musique (liste de morceaux)
+      % OUTPUT : un vecteur audio (liste de float compris entre -1.0 et 1.0)
       fun {MixMusic Music}
 	 local MixMusicAux in
 	    fun {MixMusicAux Music AudioVector}
@@ -138,48 +53,249 @@ local Mix Interprete Projet CWD in
 	    {MixMusicAux Music nil}
 	 end
       end
+      
+      
+      % +++++ Fonctions de création de VecteurAudio (pas filtres) +++++
+      
+      
+      % =================
+      %     MIXVOICE
+      % =================
+      % INPUT : une voix (liste d'echantillon)
+      % OUTPUT : un vecteur audio
+      fun {MixVoice V}
+	 local MixVoiceAux in
+	    fun {MixVoiceAux V AudioVector}
+	       case V of nil then {Flatten {Reverse AudioVector}}
+	       [] H|T then
+		  local F Note File F1 F2 in
+		     case H of silence(duree:D) then
+			F = 0.0
+			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+		     [] echantillon(duree:D hauteur:Ht instrument:none) then
+			F = {Pow 2.0 ({IntToFloat Ht}/12.0)} * 440.0
+			{MixVoiceAux T {Append [{Fill F H.duree}] AudioVector}}
+		     [] echantillon(duree:D hauteur:Ht instrument:I) then
+			Note = {HauteurToNote Ht}
+			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			%{Browse [File]}
+			%{Browse	{Couper 0.0 D [File]}}
+			%{MixVoiceAux T {Append [{Lissage {Couper 0.0 D File} D*44100.0}] AudioVector}}
+			% FIX : ça ne fonctionne pas quand j'essayer d'appliquer {Couper 0.0 D [File]}
+			%{MixVoiceAux T {Append [{Couper 0.0 D File}] AudioVector}}
+			
+			F1 = {Couper 0.001 0.021 File}
+			F2 = {Reverse F1}
+			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}] AudioVector}}
+			
+		     end
+		  end
+	       end
+	    end 
+	    {MixVoiceAux V nil}
+	 end
+      end
+      
+      
+      % =================
+      %        FILL
+      % =================
+      % INPUT : une frequence F en Hertz (float) et une duree en secondes (float)
+      % OUTPUT : un vecteur audio representant une sinusoidale pure de frequence F et de duree Duree
+      fun {Fill F Duree}
+	 local FillAux DesiredLength in
+	    DesiredLength = 44100.0*Duree
+	    fun {FillAux Length AudioVector}
+	       if Length >= DesiredLength then {Lissage {Reverse AudioVector} DesiredLength}
+	       else
+		  {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVector}}
+	       end
+	    end
+	    {FillAux 0.0 nil}
+	 end
+      end
 
-      % ==============
-      %     FONDU
-      % ==============
-      fun {Fondu Ouverture Fermeture AV}
-	 OuvertureAux = 44100.0*Ouverture
-	 FermetureAux = 44100.0*Fermeture
-	 Leng = {IntToFloat {Length AV}}
-	 fun {FonduAux ActualPlace AV Acc}
+      
+      % ================
+      %      MERGE
+      % ================
+      % INPUT : une liste de musiques avec intensite
+      % OUTPUT : un vecteur audio qui joue les musiques passee en parametre en meme temps (avec respect des intensites)
+      fun {Merge MusicsWithIntensity}
+	 local MergeAux in
+	    fun {MergeAux M AudioVector}
+	       case M of nil then AudioVector
+	       [] H|T then
+		  case H of Intensity#NewMusic then
+		     NewAudioVector
+		  in
+		     NewAudioVector = {List.map {MixMusic NewMusic} fun{$ N} Intensity*N end}
+		     {MergeAux T {Combine AudioVector NewAudioVector}}
+		  end
+	       end
+	    end 
+	    {MergeAux MusicsWithIntensity nil}
+	 end
+      end 
+
+      
+      % ================
+      %     COMBINE
+      % ================
+      % INPUT : deux listes de float, et le decalage (entier) entre la liste L1 et L2
+      % OUTPUT : une liste qui est la combinaison des deux listes en INPUT
+      % inserer une option decalage (plus rapide?)
+      fun {Combine L1 L2}
+	 fun {CombineAux L1 L2 Acc}
+	    case L1#L2 of nil#nil then {Reverse Acc}
+	    [](H1|T1)#(H2|T2) then {CombineAux T1 T2 {Append [H1+H2] Acc}}
+	    [] (H|T)#nil then {CombineAux T nil {Append [H] Acc}}
+	    [] nil#(H|T) then {CombineAux nil T {Append [H] Acc}}
+	    end
+	 end 
+      in
+	 {CombineAux L1 L2 nil}
+      end 
+
+      
+      % ================
+      %     LISSAGE
+      % ================
+      % INPUT : un vecteur audio representant une note pure
+      % OUTPUT : le meme vecteur audio mais avec une enveloppe sonore du type ACSR
+      %          (dont les parametres sont modifiables)
+      fun {Lissage AV Duree}
+	 Attack=0.1*Duree
+	 Height1=1.0
+	 Decay=0.15*Duree
+	 Height2=0.9
+	 Sustain=0.85*Duree
+	 Release=Duree
+	 fun {LissageAux AV ActualPosition Acc}
 	    case AV of nil then {Reverse Acc}
-	    [] H|T then
-	       if  ActualPlace < OuvertureAux andthen ActualPlace > Leng-FermetureAux then
-		  {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)*((Leng-ActualPlace)/(FermetureAux))|Acc}
-	       elseif ActualPlace < OuvertureAux then
-		  {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)|Acc}
-	       elseif ActualPlace > Leng-FermetureAux then 
-		  {FonduAux ActualPlace+1.0 T H*((Leng-ActualPlace)/(FermetureAux))|Acc}
-	       else {FonduAux ActualPlace+1.0 T H|Acc}
+	    []H|T then
+	       if ActualPosition < Attack then {LissageAux T ActualPosition+1.0 H*(ActualPosition/Attack)|Acc}
+	       elseif ActualPosition < Decay then
+		  Coef= ((Height2-Height1)*(ActualPosition-Attack)/(Decay-Attack))+Height1
+	       in
+		  {LissageAux T ActualPosition+1.0 H*Coef|Acc}
+	       elseif ActualPosition < Sustain then {LissageAux T ActualPosition+1.0 H*Height2|Acc}
+	       else
+		  Coef= ((0.0-Height2)*(ActualPosition-Sustain)/(Release-Sustain))+Height2
+	       in
+		  {LissageAux T ActualPosition+1.0 H*Coef|Acc}
 	       end
 	    end
 	 end
       in
-	 {FonduAux 0.0 AV nil}
+	 {LissageAux AV 0.0 nil}
+      end
+      
+      % ===============
+      %  HAUTEURTONOTE
+      % ===============
+      % INPUT : une hauteur (entier)
+      % OUTPUT : une note (atom)
+      fun {HauteurToNote Hauteur}
+	 local Octave DeltaNote in
+	    if Hauteur < 0 then
+	       Octave = 4 + ((Hauteur-2) div 12)
+	       DeltaNote = Hauteur - (((Hauteur-2) div 12)*12)
+	    else
+	       Octave = 4 + ((Hauteur+9) div 12)
+	       DeltaNote = Hauteur - (((Hauteur+9) div 12)*12)
+	    end
+	    {VirtualString.toAtom {NumberToNote (10+DeltaNote)}#Octave}
+	 end
       end
 
-      % ================
-      %  FONDUENCHAINE
-      % ================
-      fun {FonduEnchaine Duree AV1 AV2}
-	 M1={Fondu 0.0 Duree AV1}
-	 NBZeros = {Length AV1} - {FloatToInt Duree*44100.0}
-	 fun {Music2Generator NB Acc}
+
+      % ===============
+      %  NUMBERTONOTE
+      % ===============
+      % INPUT : un nombre (entier)
+      % OUTPUT : une note (atom)
+      fun {NumberToNote Number}
+	 case Number of 1 then "c"
+	 [] 2 then "c#"
+	 [] 3 then "d"
+	 [] 4 then "d#"
+	 [] 5 then "e"
+	 [] 6 then "f"
+	 [] 7 then "f#"
+	 [] 8 then "g"
+	 [] 9 then "g#"
+	 [] 10 then "a"
+	 [] 11 then "a#"
+	 [] 12 then "b"
+	 end
+      end
+
+     
+      % +++++ Fonctions de filtre +++++
+
+
+      % ===============
+      %  REPETITIONNB
+      % ===============
+      % INPUT : le nombre de repetition (entier) d'un vecteur audio (AV)
+      % OUTPUT : un vecteur audio repete autant de fois que specifie
+      fun {RepetitionNB NB AV}
+	 fun {RepetitionNBAux NB Acc}
 	    if NB==0 then Acc
 	    else
-	       {Music2Generator NB-1 0.0|Acc}
+	       {RepetitionNBAux NB-1 {Append AV Acc}}
 	    end
 	 end
-	 M2={Music2Generator NBZeros {Fondu Duree 0.0 AV2}} 
       in
-	 {Combine M1 M2}
+	 {RepetitionNBAux NB nil}
       end
 
+      
+      % ===============
+      % REPETITIONDUREE
+      % ===============
+      % INPUT : la duree en secondes (float) durant laquelle un vecteur audio doit être repete
+      % OUTPUT : le vecteur audio repete aussi longtemps que specifie
+      fun {RepetitionDuree Duree AV}
+	 Leng={Length AV}
+	 DureeAux={FloatToInt Duree*44100.0}
+	 NB=DureeAux div Leng
+	 Remaining=DureeAux mod Leng
+	 fun {FillEnd Remain AV Acc}
+	    if Remain == 0 then {Reverse Acc}
+	    else
+	       case AV of H|T then
+		  {FillEnd Remain-1 T H|Acc}
+	       end
+	    end	       
+	 end
+      in
+	 {Append {RepetitionNB NB AV} {FillEnd Remaining AV nil}}
+      end
+      
+
+      % ==============
+      %      CLIP
+      % ==============
+      % INPUT : une limite inferieure (float), spperieure (float) et un vecteur audio
+      % OUTPUT : le vecteur audio clippe
+      fun {Clip Bas Haut OldAudioVector}
+	 fun {ClipAux L Acc}
+	    case L of nil then {Reverse Acc}
+	    [] H|T then
+	       if H < Bas then {ClipAux T Bas|Acc}
+	       elseif H > Haut then {ClipAux T Haut|Acc}
+	       else
+		  {ClipAux T H|Acc}
+	       end
+	    end
+	 end
+      in
+	 {ClipAux OldAudioVector nil}
+      end
+
+      
       % ================
       %       ECHO
       % ================
@@ -206,6 +322,9 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
+      % ================
+      %       SUM
+      % ================
       % INPUT :
       % - N (entier) : le nombre de repetition
       % - D (float) : la decadence
@@ -224,96 +343,63 @@ local Mix Interprete Projet CWD in
 	 end
       end
 	 
-      % ================
-      %      MERGE
-      % ================
-      fun {Merge MusicsWithIntensity}
-	 local MergeAux in
-	    fun {MergeAux M AudioVector}
-	       case M of nil then AudioVector
-	       [] H|T then
-		  case H of Intensity#NewMusic then
-		     NewAudioVector
-		  in
-		     NewAudioVector = {List.map {MixMusic NewMusic} fun{$ N} Intensity*N end}
-		     {MergeAux T {Combine AudioVector NewAudioVector}}
-		  end
-	       end
-	    end 
-	    {MergeAux MusicsWithIntensity nil}
-	 end
-      end 
-
-      % ================
-      %     COMBINE
-      % ================
-      fun {Combine L1 L2}
-	 fun {CombineAux L1 L2 Acc}
-	    case L1#L2 of nil#nil then {Reverse Acc}
-	    [](H1|T1)#(H2|T2) then {CombineAux T1 T2 {Append [H1+H2] Acc}}
-	    [] (H|T)#nil then {CombineAux T nil {Append [H] Acc}}
-	    [] nil#(H|T) then {CombineAux nil T {Append [H] Acc}}
-	    end
-	 end 
-      in
-	 {CombineAux L1 L2 nil}
-      end 
 
       % ==============
-      %      CLIP
+      %     FONDU
       % ==============
-      fun {Clip Bas Haut OldAudioVector}
-	 fun {ClipAux L Acc}
-	    case L of nil then {Reverse Acc}
+      % INPUT : le temps de fondu a l'ouverture en secondes (float)
+      %         le temps de fondu a la fermeture en secondes (float)
+      %         et un vecteur audio
+      % OUTPUT : un vecteur audio avec un fondu au debut et a la fin
+      fun {Fondu Ouverture Fermeture AV}
+	 OuvertureAux = 44100.0*Ouverture
+	 FermetureAux = 44100.0*Fermeture
+	 Leng = {IntToFloat {Length AV}}
+	 fun {FonduAux ActualPlace AV Acc}
+	    case AV of nil then {Reverse Acc}
 	    [] H|T then
-	       if H < Bas then {ClipAux T Bas|Acc}
-	       elseif H > Haut then {ClipAux T Haut|Acc}
-	       else
-		  {ClipAux T H|Acc}
+	       if  ActualPlace < OuvertureAux andthen ActualPlace > Leng-FermetureAux then
+		  {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)*((Leng-ActualPlace)/(FermetureAux))|Acc}
+	       elseif ActualPlace < OuvertureAux then
+		  {FonduAux ActualPlace+1.0 T H*(ActualPlace/OuvertureAux)|Acc}
+	       elseif ActualPlace > Leng-FermetureAux then 
+		  {FonduAux ActualPlace+1.0 T H*((Leng-ActualPlace)/(FermetureAux))|Acc}
+	       else {FonduAux ActualPlace+1.0 T H|Acc}
 	       end
 	    end
 	 end
       in
-	 {ClipAux OldAudioVector nil}
+	 {FonduAux 0.0 AV nil}
       end
 
-      % ===============
-      %  REPETITIONNB
-      % ===============
-      fun {RepetitionNB NB AV}
-	 fun {RepetitionNBAux NB Acc}
+      % ================
+      %  FONDUENCHAINE
+      % ================
+      % INPUT : deux vecteur audio, et une duree de fondu en secondes (float)
+      % OUTPUT : un unique vecteur audio qui regroupe les 2 vecteurs audio passes
+      %          en parametre avec un fondu lineaire entre les deux
+      fun {FonduEnchaine Duree AV1 AV2}
+	 M1={Fondu 0.0 Duree AV1}
+	 NBZeros = {Length AV1} - {FloatToInt Duree*44100.0}
+	 fun {Music2Generator NB Acc}
 	    if NB==0 then Acc
 	    else
-	       {RepetitionNBAux NB-1 {Append AV Acc}}
+	       {Music2Generator NB-1 0.0|Acc}
 	    end
 	 end
+	 M2={Music2Generator NBZeros {Fondu Duree 0.0 AV2}} 
       in
-	 {RepetitionNBAux NB nil}
+	 {Combine M1 M2}
       end
-
-      % ===============
-      % REPETITIONDUREE
-      % ===============
-      fun {RepetitionDuree Duree AV}
-	 Leng={Length AV}
-	 DureeAux={FloatToInt Duree*44100.0}
-	 NB=DureeAux div Leng
-	 Remaining=DureeAux mod Leng
-	 fun {FillEnd Remain AV Acc}
-	    if Remain == 0 then {Reverse Acc}
-	    else
-	       case AV of H|T then
-		  {FillEnd Remain-1 T H|Acc}
-	       end
-	    end	       
-	 end
-      in
-	 {Append {RepetitionNB NB AV} {FillEnd Remaining AV nil}}
-      end
+	 
 
       % ===============
       %     COUPER
       % ===============
+      % INPUT :
+      %   - Begin : la duree en secondes (float) avant le debut de la coupure
+      %   - End : la duree en secondes (float) de la fin de la coupure
+      % OUTPUT : un vecteur audio qui a ete coupe
       fun {Couper Begin End AV}
 	 BeginAux=Begin*44100.0
 	 EndAux=End*44100.0
@@ -337,39 +423,15 @@ local Mix Interprete Projet CWD in
 	 {CouperAux AV BeginPlace nil}
       end
 
-      % ================
-      %     LISSAGE
-      % ================
-      fun {Lissage AV Duree}
-	 Attack=0.1*Duree
-	 Height1=1.0
-	 Decay=0.15*Duree
-	 Height2=0.9
-	 Sustain=0.85*Duree
-	 Release=Duree
-	 fun {LissageAux AV ActualPosition Acc}
-	    case AV of nil then {Reverse Acc}
-	    []H|T then
-	       if ActualPosition < Attack then {LissageAux T ActualPosition+1.0 H*(ActualPosition/Attack)|Acc}
-	       elseif ActualPosition < Decay then
-		  Coef= ((Height2-Height1)*(ActualPosition-Attack)/(Decay-Attack))+Height1
-	       in
-		  {LissageAux T ActualPosition+1.0 H*Coef|Acc}
-	       elseif ActualPosition < Sustain then {LissageAux T ActualPosition+1.0 H*Height2|Acc}
-	       else
-		  Coef= ((0.0-Height2)*(ActualPosition-Sustain)/(Release-Sustain))+Height2
-	       in
-		  {LissageAux T ActualPosition+1.0 H*Coef|Acc}
-	       end
-	    end
-	 end	    	     
-      in
-	 {LissageAux AV 0.0 nil}
-      end
+      
+      
+      
+      
    in
       {MixMusic Music} 
    end
 
+   
    % +++++++++++++++++++++++++++++++++++++++++
    % +            INTERPRETE                 +
    % +++++++++++++++++++++++++++++++++++++++++
@@ -412,7 +474,7 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
-	 %+++++Fonctions de transformation+++++
+	 % +++++ Fonctions de transformation +++++
 	 
          % ================
          %    DUREETRANS
@@ -543,7 +605,7 @@ local Mix Interprete Projet CWD in
 	 end
 
 
-	 %+++++Fonctions secondaires+++++
+	 % +++++ Fonctions complementaires +++++
 	 
          % ================
          %  VOICEDURATION
