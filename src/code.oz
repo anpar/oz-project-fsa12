@@ -412,38 +412,30 @@ local Mix Interprete Projet CWD in
 	    end
 	 end
 
-      % ================
-      %    INSTRUMENT
-      % ================
-      % INPUT : une partition (liste) brute et un instrument (atom)
-      % OUTPUT : une voix, c'est a dire une liste d'echantillon dont
-      % l'instrument sera mis a I
-	 fun {Instrument Instrument Part}
-	    local Echantillon InstrumentSimplestCase InstrumentAux in
-	    % On va parcourir un a un les elements de la partition de laquelle on
-	    % veut changer l'instrument. On stocke dans l'accumulateur le resultat
-	    % de ce changement, c'est a dire la voix modifie.
-	       fun {InstrumentAux I P Acc}
-		  case {Flatten P} of nil then Acc
+         % ================
+         %    INSTRUMENT
+         % ================
+         % INPUT : une partition (liste) brute et un instrument (atom)
+         % OUTPUT : une voix, c'est a dire une liste d'echantillon dont
+         % l'instrument sera mis a I
+	 fun {Instrument InstrumentAtom Part}
+	    local Echantillon InstrumentAux in
+               % On va parcourir un a un les elements de la partition de laquelle on
+               % veut changer l'instrument. On stocke dans l'accumulateur le resultat
+               % de ce changement, c'est a dire la voix modifie.
+	       fun {InstrumentAux Voice Acc}
+		  case Voice of nil then {Reverse Acc}
 		  [] H|T then
-		     case H of instrument(nom:I2 P2) then
-			{InstrumentAux I T {Append Acc {InstrumentAux I2 [P2] nil}}}
-		     else
-			{InstrumentAux I T {Append Acc {InstrumentSimplestCase I {InterpreteFlattened [H]} nil}}}
+		     case H of silence(duree:D) then {InstrumentAux T silence(duree:D)|Acc}
+		     []echantillon(hauteur:Hauteur duree:D instrument:none)
+		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:InstrumentAtom)|Acc}
+		     []echantillon(hauteur:Hauteur duree:D instrument:I)
+		     then {InstrumentAux T echantillon(hauteur:Hauteur duree:D instrument:I)|Acc}
 		     end
 		  end
 	       end
 
-	    % On s'occupe du cas le plus simple à savoir instrument(nom:<atom> <note>)
-	       fun {InstrumentSimplestCase I V Acc}
-		  case {Flatten V} of nil then Acc
-		  [] H|T then
-		     case H of silence(duree:D) then {InstrumentSimplestCase I T {Append Acc [silence(duree:D)]}}
-		     else {InstrumentSimplestCase I T {Append Acc [echantillon(hauteur:H.hauteur duree:H.duree instrument:I)]}}
-		     end
-		  end
-	       end
-	       {InstrumentAux Instrument Part nil}
+	       {InstrumentAux {Interprete Part} nil}
 	    end
 	 end
 	 
