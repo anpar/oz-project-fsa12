@@ -64,8 +64,13 @@ local Mix Interprete Projet CWD in
       % FIX : semble ne pas fonctionner pour les notes d'octaves > 4, a regler
       fun {HauteurToNote Hauteur}
 	 local Octave DeltaNote in
-	    Octave = 4 + ((Hauteur-2) div 12)
-	    DeltaNote = Hauteur - ((Hauteur div 12)*12)
+	    if Hauteur < 0 then
+	       Octave = 4 + ((Hauteur-2) div 12)
+	       DeltaNote = Hauteur - (((Hauteur-2) div 12)*12)
+	    else
+	       Octave = 4 + ((Hauteur+9) div 12)
+	       DeltaNote = Hauteur - (((Hauteur+9) div 12)*12)
+	    end
 	    {VirtualString.toAtom {NumberToNote (10+DeltaNote)}#Octave}
 	 end
       end
