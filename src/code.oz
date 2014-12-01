@@ -111,7 +111,7 @@ local Mix Interprete Projet CWD in
 		  NewAV
 	       in
 		  case H of voix(V) then NewAV = {MixVoice V} 
-		  [] partition(P) then NewAV = {MixVoice {Interprete P}}
+		  [] partition(P) then NewAV = {MixVoice {Interprete [P]}}
 		  [] wave(F) then NewAV = {Projet.readFile F}
 		  [] merge(M) then NewAV = {Merge M}
 		  [] renverser(M) then NewAV = {Reverse {MixMusic M}}
@@ -388,31 +388,29 @@ local Mix Interprete Projet CWD in
 		     Duree
 		     Echantillon
 		  in
-		     case FlattenedPartition of nil then Acc
+		     case FlattenedPartition of nil then {Reverse Acc}
 		     []  H|T then
 			case H
 			of muet(P) then
-			   Duree = {VoiceDuration {InterpreteFlattened {Flatten P}}}
+			   Duree = {VoiceDuration {InterpreteFlattened {Flatten [P]}}}
 			   Echantillon = [silence(duree:Duree)]
 			[] duree(secondes:S P) then Echantillon = {DureeTrans S [P]}
 			[] etirer(facteur:F P) then Echantillon = {Etirer F [P]}
 			[] bourdon(note:N P) then Echantillon = {Bourdon N [P]}
 			[] transpose(demitons:DT P) then Echantillon = {Transpose DT [P]}
-			[] silence then Echantillon = [silence(duree:1.0)]
 			[] instrument(nom:I P) then Echantillon = {Instrument I [P]}
-		     else 
-			Echantillon = [echantillon(hauteur:Hauteur duree:1.0 instrument:none)]
-			Hauteur = {NumberOfSemiTones {ToNote H}}
-		     end 
-		     {InterpreteFlattenedAux T {Append Acc Echantillon}}
-			% FIX : on gagnerait en rapidite en inversant les arguments de Append et en faisant
-			% un reverse apres non?
-		  end 	    
-	       end
-	    end 
-	    {InterpreteFlattenedAux FlattenedPartition nil}
+			[] silence then Echantillon = [silence(duree:1.0)]
+			else 
+			   Echantillon = [echantillon(hauteur:Hauteur duree:1.0 instrument:none)]
+			   Hauteur = {NumberOfSemiTones {ToNote H}}
+			end 
+			{InterpreteFlattenedAux T {Append Echantillon Acc}}
+		     end 	    
+		  end
+	       end 
+	       {InterpreteFlattenedAux FlattenedPartition nil}
+	    end
 	 end
-      end
 
       % ================
       %    INSTRUMENT
@@ -420,59 +418,59 @@ local Mix Interprete Projet CWD in
       % INPUT : une partition (liste) brute et un instrument (atom)
       % OUTPUT : une voix, c'est a dire une liste d'echantillon dont
       % l'instrument sera mis a I
-      fun {Instrument Instrument Part}
-	 local Echantillon InstrumentSimplestCase InstrumentAux in
+	 fun {Instrument Instrument Part}
+	    local Echantillon InstrumentSimplestCase InstrumentAux in
 	    % On va parcourir un a un les elements de la partition de laquelle on
 	    % veut changer l'instrument. On stocke dans l'accumulateur le resultat
 	    % de ce changement, c'est a dire la voix modifie.
-	    fun {InstrumentAux I P Acc}
-	       case {Flatten P} of nil then Acc
-	       [] H|T then
-		  case H of instrument(nom:I2 P2) then
-		     {InstrumentAux I T {Append Acc {InstrumentAux I2 [P2] nil}}}
-		  else
-		     {InstrumentAux I T {Append Acc {InstrumentSimplestCase I {InterpreteFlattened [H]} nil}}}
+	       fun {InstrumentAux I P Acc}
+		  case {Flatten P} of nil then Acc
+		  [] H|T then
+		     case H of instrument(nom:I2 P2) then
+			{InstrumentAux I T {Append Acc {InstrumentAux I2 [P2] nil}}}
+		     else
+			{InstrumentAux I T {Append Acc {InstrumentSimplestCase I {InterpreteFlattened [H]} nil}}}
+		     end
 		  end
 	       end
-	    end
 
 	    % On s'occupe du cas le plus simple à savoir instrument(nom:<atom> <note>)
-	    fun {InstrumentSimplestCase I V Acc}
-	       case {Flatten V} of nil then Acc
-	       [] H|T then
-		  case H of silence(duree:D) then {InstrumentSimplestCase I T {Append Acc [silence(duree:D)]}}
-		  else {InstrumentSimplestCase I T {Append Acc [echantillon(hauteur:H.hauteur duree:H.duree instrument:I)]}}
+	       fun {InstrumentSimplestCase I V Acc}
+		  case {Flatten V} of nil then Acc
+		  [] H|T then
+		     case H of silence(duree:D) then {InstrumentSimplestCase I T {Append Acc [silence(duree:D)]}}
+		     else {InstrumentSimplestCase I T {Append Acc [echantillon(hauteur:H.hauteur duree:H.duree instrument:I)]}}
+		     end
 		  end
 	       end
+	       {InstrumentAux Instrument Part nil}
 	    end
-	    {InstrumentAux Instrument Part nil}
 	 end
-      end
 	 
          % ================
          %    DUREETRANS
          % ================
          % INPUT : Une partition (liste) brute et une duree (float)
-	 % OUTPUT : Une voix, c'est a dire une liste d'echantillon dont la duree
-	 % totale a ete modifie.
-      	    fun {DureeTrans WantedDuration Part}
-	       local Voice DureeAux TotalDuration in
-		  Voice = {InterpreteFlattened {Flatten Part}}
-		  TotalDuration = {VoiceDuration Voice}
-		  fun {DureeAux V}
-		     case V of nil then nil
-		     [] E|T then
-			case E of silence(duree:D)
-			then silence(duree:(D*(WantedDuration/TotalDuration)))|{DureeAux T}
-			else echantillon(hauteur:E.hauteur
-					 duree:(E.duree*(WantedDuration/TotalDuration))
-					 instrument:none)|{DureeAux T}
-			end
+         % OUTPUT : Une voix, c'est a dire une liste d'echantillon dont la duree
+         % totale a ete modifie.
+	 fun {DureeTrans WantedDuration Part}
+	    local Voice DureeAux TotalDuration in
+	       Voice = {InterpreteFlattened {Flatten Part}}
+	       TotalDuration = {VoiceDuration Voice}
+	       fun {DureeAux V}
+		  case V of nil then nil
+		  [] E|T then
+		     case E of silence(duree:D)
+		     then silence(duree:(D*(WantedDuration/TotalDuration)))|{DureeAux T}
+		     else echantillon(hauteur:E.hauteur
+				      duree:(E.duree*(WantedDuration/TotalDuration))
+				      instrument:E.intrument)|{DureeAux T}
 		     end
-		  end 
-		  {DureeAux Voice} 	   
-	       end
+		  end
+	       end 
+	       {DureeAux Voice} 	   
 	    end
+	 end
 
          % ================
          %      ETIRER
@@ -480,22 +478,22 @@ local Mix Interprete Projet CWD in
          % INPUT : une partition (liste) brute et un facteur d'etirement (float)
 	 % OUTPUT : une voix, c'est a dire une liste d'echantillon, dont la duree
 	 % aura ete multiplie par facteur.
-      fun {Etirer Facteur Part}
-	 local Voice EtirerAux in
-	    fun {EtirerAux V}
-	       case V of nil then nil
-	       [] E|T then
-		  case E of silence(duree:D) then silence(duree:Facteur*D)|{EtirerAux T}
-		  else echantillon(hauteur:E.hauteur
-				   duree:(E.duree*Facteur)
-				   instrument:none)|{EtirerAux T}
+	 fun {Etirer Facteur Part}
+	    local Voice EtirerAux in
+	       fun {EtirerAux V}
+		  case V of nil then nil
+		  [] E|T then
+		     case E of silence(duree:D) then silence(duree:Facteur*D)|{EtirerAux T}
+		     else echantillon(hauteur:E.hauteur
+				      duree:(E.duree*Facteur)
+				      instrument:E.instrument)|{EtirerAux T}
+		     end 
 		  end 
-	       end 
-	    end
-	    Voice = {InterpreteFlattened {Flatten Part}}
-	    {EtirerAux Voice} 
+	       end
+	       Voice = {InterpreteFlattened {Flatten Part}}
+	       {EtirerAux Voice} 
+	    end 
 	 end 
-      end 
 
          % ================
          %     BOURDON
@@ -503,21 +501,27 @@ local Mix Interprete Projet CWD in
          % INPUT : une note (pas au format étendu) et une partition (liste) brute
 	 % OUTPUT : une voix, c'est à dire une liste d'échantillon, dont toutes les notes
 	 % ont été transformé en Note
-      fun {Bourdon Note Part}
-	 local Voice BourdonAux in
-	    fun {BourdonAux V}
-	       case Note#V of M#nil then nil
-	       [] silence#(E|T) then silence(duree:E.duree)|{BourdonAux T}
-	       [] M#(E|T) then
-		  echantillon(hauteur:{NumberOfSemiTones {ToNote Note}}
-			      duree:E.duree
-			      instrument:none)|{BourdonAux T}
+	 fun {Bourdon Note Part}
+	    local Voice BourdonAux Hauteur in
+	       Hauteur = {NumberOfSemiTones {ToNote Note}}
+	       fun {BourdonAux V}
+		  case Note#V of M#nil then nil
+		  [] silence#(E|T) then silence(duree:E.duree)|{BourdonAux T}
+		  [] M#(E|T) then
+		     case E of silence(duree:D)
+		     then echantillon(hauteur:Hauteur
+				      duree:D
+				      instrument:none)|{BourdonAux T}
+		     else echantillon(hauteur:Hauteur
+				      duree:E.duree
+				      instrument:E.instrument)|{BourdonAux T}
+		     end
+		  end 
 	       end 
+	       Voice = {InterpreteFlattened {Flatten Part}}
+	       {BourdonAux Voice} 
 	    end 
-	    Voice = {InterpreteFlattened {Flatten Part}}
-	    {BourdonAux Voice} 
 	 end 
-      end 
 
          % ================
          %    TRANSPOSE
@@ -525,38 +529,38 @@ local Mix Interprete Projet CWD in
          % INPUT : Un nombre de demi-tons (integer) et une partition (liste) brute
 	 % OUTPUT : Une voix, c'est à dire une liste d'échantillon, dont toutes les
 	 % notes ont une hauteur transposée de Demitons demi-tons.
-      fun {Transpose Demitons Part}
-	 local Voice TransposeAux in
-	    fun {TransposeAux V}
-	       case V of nil then nil
-	       [] E|T then
-		  case E of silence(duree:D) then silence(duree:D)|{TransposeAux T}
-		  else echantillon(hauteur:E.hauteur+Demitons
-				   duree:E.duree
-				   instrument:none)|{TransposeAux T}
+	 fun {Transpose Demitons Part}
+	    local Voice TransposeAux in
+	       fun {TransposeAux V}
+		  case V of nil then nil
+		  [] E|T then
+		     case E of silence(duree:D) then silence(duree:D)|{TransposeAux T}
+		     else echantillon(hauteur:E.hauteur+Demitons
+				      duree:E.duree
+				      instrument:E.instrument)|{TransposeAux T}
+		     end
 		  end
 	       end
+	       Voice = {InterpreteFlattened {Flatten Part}}
+	       {TransposeAux Voice} 
 	    end
-	    Voice = {InterpreteFlattened {Flatten Part}}
-	    {TransposeAux Voice} 
 	 end
-      end
 
          % ================
          %  VOICEDURATION
          % ================
          % INPUT : une voix, c'est à dire une liste d'échantillon.
 	 % OUTPUT : la durée totale de la voix (float).
-      fun {VoiceDuration ListEchantillon}
-	 local VoiceDurationAux in
-	    fun {VoiceDurationAux List Acc}
-	       case List of nil then Acc
-	       [] H|T then {VoiceDurationAux T (Acc+H.duree)}
-	       end 	  
+	 fun {VoiceDuration ListEchantillon}
+	    local VoiceDurationAux in
+	       fun {VoiceDurationAux List Acc}
+		  case List of nil then Acc
+		  [] H|T then {VoiceDurationAux T (Acc+H.duree)}
+		  end 	  
+	       end 
+	       {VoiceDurationAux ListEchantillon 0.0}
 	    end 
-	    {VoiceDurationAux ListEchantillon 0.0}
-	 end 
-      end
+	 end
 
          % =================
          % NUMBEROFSEMITONES
@@ -564,98 +568,101 @@ local Mix Interprete Projet CWD in
          % INPUT : une note (au format etendu, il faut donc appliquer ToNote sur l'argument
 	 % si necessaire).
 	 % OUTPUT : le nombre de demi-tons au dessus (ou en dessous) de a4 (integer)
-      fun {NumberOfSemiTones Note}
-	 local
-	    ReferenceNote = note(nom:a octave:4 alteration:none) 
-	    DeltaOctave = Note.octave - ReferenceNote.octave
-	    NoteNumber = {NameToNumber Note.nom}
-	    ReferenceNoteNumber = {NameToNumber ReferenceNote.nom}
-	    DeltaNote = NoteNumber - ReferenceNoteNumber
-	    Correction1
-	    Correction2
-	 in	    
-	    if NoteNumber =< 3 then
-	       Correction1 = 1
-	    else
-	       Correction1 = 0
-	    end 
-	    if Note.alteration == '#' then
-	       Correction2 = 1
-	    else
-	       Correction2 = 0
+	 fun {NumberOfSemiTones Note}
+	    local
+	       ReferenceNote = note(nom:a octave:4 alteration:none) 
+	       DeltaOctave = Note.octave - ReferenceNote.octave
+	       NoteNumber = {NameToNumber Note.nom}
+	       ReferenceNoteNumber = {NameToNumber ReferenceNote.nom}
+	       DeltaNote = NoteNumber - ReferenceNoteNumber
+	       Correction1
+	       Correction2
+	    in	    
+	       if NoteNumber =< 3 then
+		  Correction1 = 1
+	       else
+		  Correction1 = 0
+	       end 
+	       if Note.alteration == '#' then
+		  Correction2 = 1
+	       else
+		  Correction2 = 0
+	       end
+	       12*DeltaOctave + 2*DeltaNote + Correction1 + Correction2
 	    end
-	    12*DeltaOctave + 2*DeltaNote + Correction1 + Correction2
 	 end
-      end
 
+	 % =================
+         %   NAMETONUMBER
+         % =================
 	 % INPUT : un nom de note (atom)
 	 % OUTPUT : un chiffre (integer) correspondant, utilise lors
 	 % du calcul de demi-tons par rapport a a4
-      fun {NameToNumber Name}
-	 case Name of c then 1
-	 [] d then 2
-	 [] e then 3
-	 [] f then 4
-	 [] g then 5
-	 [] a then 6
-	 [] b then 7
+	 fun {NameToNumber Name}
+	    case Name of c then 1
+	    [] d then 2
+	    [] e then 3
+	    [] f then 4
+	    [] g then 5
+	    [] a then 6
+	    [] b then 7
+	    end
 	 end
-      end
 
          % ================
          %      TONOTE
          % ================
 	 % INPUT : une note (au format brute, pas etendu)
 	 % OUTPUT : une note au format etendu (record)
-      fun {ToNote Note}
-	 case Note
-	 of Nom#Octave then note(nom:Nom octave:Octave alteration:'#')
-	 [] Atom then
-	    case {AtomToString Atom}
-	    of [N] then note(nom:Atom octave:4 alteration:none)
-	    [] [N O] then note(nom:{StringToAtom [N]}
-			       octave:{StringToInt [O]}
-			       alteration:none)
+	 fun {ToNote Note}
+	    case Note
+	    of Nom#Octave then note(nom:Nom octave:Octave alteration:'#')
+	    [] Atom then
+	       case {AtomToString Atom}
+	       of [N] then note(nom:Atom octave:4 alteration:none)
+	       [] [N O] then note(nom:{StringToAtom [N]}
+				  octave:{StringToInt [O]}
+				  alteration:none)
+	       end
 	    end
 	 end
-      end
-   in
-      {InterpreteFlattened {Flatten Partition}}
+      in
+	 {InterpreteFlattened {Flatten Partition}}
+      end 
    end 
-end 
 
    % +++++++++++++++++++++++++++++
    % +        TEST ZONE          +
    % +++++++++++++++++++++++++++++
    local 
-   Joie = {Projet.load CWD#'joie.dj.oz'}
-   Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
-   Part2 = [silence c4 d4]
-   Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
-   Part4 = [duree(secondes:10.0 [a4 b4 c4])]
-   Part5 = [a4 b2 e1]
-   Part6 = [instrument(nom:guitare [a4 b4 c4])]
-   Part7 = [instrument(nom:guitare instrument(nom:piano a4))]
-   Part8 = [instrument(nom:guitare [instrument(nom:piano a4) [e1 e2]])]
-   Part9 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute a4)])])]
-   Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
-   Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
-   Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
-   Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
+      Joie = {Projet.load CWD#'joie.dj.oz'}
+      Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
+      Part2 = [silence c4 d4]
+      Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
+      Part4 = [duree(secondes:10.0 [a4 b4 c4])]
+      Part5 = [a4 b2 e1]
+      Part6 = [instrument(nom:guitare [a4 b4 c4])]
+      Part7 = [instrument(nom:guitare instrument(nom:piano a4))]
+      Part8 = [instrument(nom:guitare [instrument(nom:piano a4) [e1 e2]])]
+      Part9 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute a4)])])]
+      Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
+      Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
+      Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
+      Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
    % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
-   Chat = wave(CWD#'wave/animaux/cat.wav')
-   M = partition([a b c])
+      Chat = wave(CWD#'wave/animaux/cat.wav')
+      M = partition([a b c])
       
    %Music = [repetition(nombre:3 [partition(Part2)])]
    %Joie = [partition([a b c])]
    %Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
    %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
    %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
-   Music = Joie
+      Music = Joie
    % Remarque : appliquer un instrument à Joie en entier semble prendre beaucoup trop de temps (ou ne pas fonctionner)
    % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
-in
-   {Browse begin}
-   {Browse {Projet.run Mix Interprete Joie CWD#'out.wav'}}
-end
+   in
+      {Browse begin}
+      {Browse {Projet.run Mix Interprete Joie CWD#'out.wav'}}
+   end
 end

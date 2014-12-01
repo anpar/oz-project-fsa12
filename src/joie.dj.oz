@@ -11,5 +11,5 @@ local
    Partition = [etirer(facteur:0.5 [Tune End1 Tune End2 Interlude Tune End2])]
 in
    % Ceci est une musique :-)
-   [partition(Partition)]
+   [partition([instrument(nom:'woody' Partition)])]
 end
