@@ -1,5 +1,5 @@
 \documentclass[12pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
+\usepackage[lutf8]{inputenc}
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -25,7 +25,106 @@ Nous avons divisé, comme demandé, le programme en trois parties:
 	\item un fichier example.dj.oz, qui contient une musique.
 \end{itemize}
 
-Les deux fonctions que nous avons créées sont écrites entièrement en programmation déclarative. Par ailleurs, nous avons rendu toutes nos sous-fonctions récursives terminales.
+
+
+	\begin{table}[ht!]
+		\centering
+			\begin{tabular}{|p{0.15\textwidth}|p{0.22\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|}
+			\hline
+			\textbf{Fonction}		& \textbf{Sous-fonction maitresse}& \textbf{Sous-fonctions principales} & \textbf{Autres sous-fonctions}	\\
+			\hline
+Interprete		&InterpreteFlattened	& DureeTrans, Etirer, Bourdon, Transpose, Instrument, ... & ToNote, NumberOfSemiTones, ...\\
+			\hline
+Mix 	& MixMusic &  MixVoice, Merge, RepetitionNB, Echo, ... &  Fill, Combine, ...\\
+			\hline 
+
+
+			\hline
+			\end{tabular}
+		\caption{Résumé des fonctions de notre programme.}
+	\end{table}
+
+
+\section{Décisions prises et astuces de programmation}
+\paragraph{Programmation déclarative} Aucune structure non-déclarative n'a été nécessaire pour écrire notre programme. Nous n'en avons donc pas utilisé.
+
+\paragraph{Récursion terminale}
+Pour rendre notre code plus rapide, nous nous sommes arrangés pour que toutes nos sous-fonctions
+ soient récursives terminales. Pour ce faire, nous avons, notamment, utilisé des accumulateurs.
+
+\paragraph{Astuce lors des récursions}
+A de nombreux endroits du code, nous devions construire progressivement une liste 
+(en utilisant la récursion terminale). Une technique consiste à utiliser la fonction
+\{Append Accumulateur NouvelElement\}. Le problème est que Append va d'abord parcourir
+l'accumulateur en entier avant "d'ajouter" le nouvel élément... Or, très souvent, l'accumulateur est très grand (en particulier si la musique à mixer est grande) et le nouvel élément très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer notre code, nous avons donc inversé les arguments dans le Append, et à la fin de la fonction, nous renvoyons \{Reverse Acc\}. Ceci permet de ne parcourir qu'une seule fois 
+la liste en entier, et donc de réduire la complexité.
+
+\paragraph{Astuce lors de Reverse}
+
+
+
+\section{Complexité calculatoire}
+Comme nos fonctions peuvent Dans cette section, nous donnons les complexité calculatoire
+propre de chaque fonction, c'est à dire sans tenir des sous-fonctions
+utilisées.
+
+	\begin{table}[ht!]
+		\centering
+			\begin{tabular}{|p{0.40\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|}
+			\hline
+			\textbf{Fonctions}																& \textbf{Temporelle}							& \textbf{Spatiale}	\\
+			\hline
+			InterpreteFlattened																& $n$ 														& $1$ \\
+			\hline
+			DureeTrans WantedDuration Part 										& $n$, taille de Part							& $1$ \\
+			\hline 
+			Etirer Facteur Part																& $n$, taille de Part 						& $1$ \\
+			\hline
+			Bourdon Note Part																	& $n$, taille de Part 						& $1$ \\
+			\hline
+			Transpose Demitons Part														& $n$, taille de Part 						& $1$ \\
+			\hline
+			Instrument InstrumentAtom Part										& $n$, taille de Part							& $1$ \\
+			\hline
+			VoiceDuration ListEchantillon											& $n$, taille de ListEchantillon	& $1$ \\
+			\hline
+			NumberOfSemiTones Note														& $1$ 														& $1$ \\
+			\hline
+			NameToNumber Name																	& $1$ 														& $1$ \\
+			\hline
+			ToNote Note																				& $1$ 														& $1$ \\ 
+			\hline
+			\hline
+			MixMusic Music																		& $n$, taille de Music						& $1$ \\
+			\hline
+			MixVoice Voice																		& $n$, taille de Voice						& $1$ \\
+			\hline
+			Fill F Duree																			& $n$, valeur de Duree						& $1$ \\
+			\hline
+			Merge MusicsWithIntensity													& $n$, taille de MusicsWithIntensity	& $1$ \\
+			\hline
+			Combine L1 L2																			& $n$, taille de la plus grande des listes	& $1$ \\
+			\hline
+			Lissage AV Duree																	& $n$, taille de AV								& $1$ \\
+			\hline
+			HauteurToNote																			& $1$ 														& $1$ \\
+			\hline
+			NumberToNote																			& $1$ 														& $1$ \\
+			\hline
+			\end{tabular}
+		\caption{Analyse de la complexité calculatoire de nos fonctions.}
+	\end{table}
+
+
+\section{Extensions}
+% TODO
+\section{Pistes d'améliorations}
+% TODO : gestion des erreurs
+
+
+\newpage
+
+
 
 \subsection{Fonction Interprete}
 \subsubsection{Sous-fonction principale}
@@ -104,83 +203,5 @@ Il y a autant de sous-fonction de filtre qu'il y a de filtres possibles (sauf po
 	\item ... (la suite de la liste se déduit assez facilement, et n'est pas particulièrement intéressante)
 \end{itemize}
 
-\section{Complexité calculatoire}
-Dans cette section, nous donnons les complexité calculatoire
-propre de chaque fonction, c'est à dire sans tenir des sous-fonctions
-utilisées.
-
-	\begin{table}[ht!]
-		\centering
-			\begin{tabular}{|p{0.40\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|}
-			\hline
-			\textbf{Fonctions}																& \textbf{Temporelle}							& \textbf{Spatiale}	\\
-			\hline
-			InterpreteFlattened																& $n$ 														& $1$ \\
-			\hline
-			DureeTrans WantedDuration Part 										& $n$, taille de Part							& $1$ \\
-			\hline 
-			Etirer Facteur Part																& $n$, taille de Part 						& $1$ \\
-			\hline
-			Bourdon Note Part																	& $n$, taille de Part 						& $1$ \\
-			\hline
-			Transpose Demitons Part														& $n$, taille de Part 						& $1$ \\
-			\hline
-			Instrument InstrumentAtom Part										& $n$, taille de Part							& $1$ \\
-			\hline
-			VoiceDuration ListEchantillon											& $n$, taille de ListEchantillon	& $1$ \\
-			\hline
-			NumberOfSemiTones Note														& $1$ 														& $1$ \\
-			\hline
-			NameToNumber Name																	& $1$ 														& $1$ \\
-			\hline
-			ToNote Note																				& $1$ 														& $1$ \\ 
-			\hline
-			\hline
-			MixMusic Music																		& $n$, taille de Music						& $1$ \\
-			\hline
-			MixVoice Voice																		& $n$, taille de Voice						& $1$ \\
-			\hline
-			Fill F Duree																			& $n$, valeur de Duree						& $1$ \\
-			\hline
-			Merge MusicsWithIntensity													& $n$, taille de MusicsWithIntensity	& $1$ \\
-			\hline
-			Combine L1 L2																			& $n$, taille de la plus grande des listes	& $1$ \\
-			\hline
-			Lissage AV Duree																	& $n$, taille de AV								& $1$ \\
-			\hline
-			HauteurToNote																			& $1$ 														& $1$ \\
-			\hline
-			NumberToNote																			& $1$ 														& $1$ \\
-			\hline
-			\end{tabular}
-		\caption{Analyse de la complexité calculatoire de nos fonctions.}
-	\end{table}
-
-\section{Décisions prises et astuces de programmation}
-\paragraph{Programmation déclarative} Comme dit ci-dessus, aucune structure non-déclarative 
-n'a été nécessaire pour écrire notre programme. Nous n'en avons donc pas utilisé.
-
-\paragraph{Récursion terminale}
-Pour rendre notre code plus rapide, nous nous sommes arrangés pour que toutes nos sous-fonctions
- soient récursives terminales. Nous avons également utilisé des accumulateurs.
-
-\paragraph{Astuce lors des récursions}
-A de nombreux endroits du code, nous devions construire progressivement une liste 
-(en utilisant la récursion terminale). Une technique consiste à utiliser la fonction
-{Append Accumulateur NouvelElement}. Le problème est que Append va d'abord parcourir
-l'accumulateur en entier avant "d'ajouter" le nouvel élément... Or, très souvent, 
-l'accumulateur est très grand (en particulier si la musique à mixer est grande) et 
-le nouvel élément très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer
-notre code, nous avons donc inversé les arguments dans le Append, et à la fin de la 
-fonction, nous renvoyons {Reverse Acc}. Ceci permet de ne parcourir qu'une seule fois 
-la liste en entier, et donc de réduire la complexité.
-
-\paragraph{Astuce lors de Reverse}
-
-
-\section{Extensions}
-% TODO
-\section{Pistes d'améliorations}
-% TODO : gestion des erreurs
 
 \end{document}
