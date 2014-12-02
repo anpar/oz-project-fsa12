@@ -1,13 +1,13 @@
 % Brabanconne
 local
    MainDroite = [etirer(facteur:0.5 g4) etirer(facteur:0.75 e4) etirer(facteur:0.25 f4) %1
-		 g4 etirer(facteur:0.75 a5) etirer(facteur:0.25 b5) etirer(facteur:0.75 c5) etirer(facteur:0.25 b5) etirer(facteur:0.75 c5) etirer(facteur:0.25 e5) %2
-		 etirer(facteur:1.5 g4) etirer(facteur:0.25 b5) etirer(facteur:0.25 a5) etirer(facteur:0.5 g4) etirer(facteur:0.5 silence) etirer(facteur:0.75 b5) etirer(facteur:0.25 c5) %3
-		 d5 etirer(facteur:0.75 d5) etirer(facteur:0.25 d5) etirer(facteur:0.75 d5) etirer(facteur:0.125 e5) etirer(facteur:0.125 d5) etirer(facteur:0.75 c5) etirer(facteur:0.25 b5) %4
-		 etirer(facteur:0.5 c5) etirer(facteur:0.5 silence) etirer(facteur:1.75 e5) etirer(facteur:0.25 b5) etirer(facteur:0.75 c5) etirer(facteur:0.25 a5) %5
-		 g4 etirer(facteur:0.75 a5) etirer(facteur:0.25 b5) etirer(facteur:0.75 c5) etirer(facteur:0.25 b5) etirer(facteur:0.75 c5) etirer(facteur:0.25 d5) %6
-		 etirer(facteur:1.5 b5) etirer(facteur:0.25 d5) etirer(facteur:0.25 c5) etirer(facteur:0.5 b5) etirer(facteur:0.5 silence) etirer(facteur:0.75 b5) etirer(facteur:0.25 a5) %7
-		 g4 etirer(facteur:0.75 g4) etirer(facteur:0.25 b5) d5 etirer(facteur:0.75 c5) etirer(facteur:0.25 a5) %8
+		 g4 etirer(facteur:0.75 a4) etirer(facteur:0.25 b4) etirer(facteur:0.75 c5) etirer(facteur:0.25 b4) etirer(facteur:0.75 c5) etirer(facteur:0.25 e5) %2
+		 etirer(facteur:1.5 g4) etirer(facteur:0.25 b4) etirer(facteur:0.25 a4) etirer(facteur:0.5 g4) etirer(facteur:0.5 silence) etirer(facteur:0.75 b4) etirer(facteur:0.25 c5) %3
+		 d5 etirer(facteur:0.75 d5) etirer(facteur:0.25 d5) etirer(facteur:0.75 d5) etirer(facteur:0.125 e5) etirer(facteur:0.125 d5) etirer(facteur:0.75 c5) etirer(facteur:0.25 b4) %4
+		 etirer(facteur:0.5 c5) etirer(facteur:0.5 silence) etirer(facteur:1.75 e5) etirer(facteur:0.25 b4) etirer(facteur:0.75 c5) etirer(facteur:0.25 a4) %5
+		 g4 etirer(facteur:0.75 a4) etirer(facteur:0.25 b4) etirer(facteur:0.75 c5) etirer(facteur:0.25 b4) etirer(facteur:0.75 c5) etirer(facteur:0.25 d5) %6
+		 etirer(facteur:1.5 b4) etirer(facteur:0.25 d5) etirer(facteur:0.25 c5) etirer(facteur:0.5 b4) etirer(facteur:0.5 silence) etirer(facteur:0.75 b4) etirer(facteur:0.25 a4) %7
+		 g4 etirer(facteur:0.75 g4) etirer(facteur:0.25 b4) d5 etirer(facteur:0.75 c5) etirer(facteur:0.25 a4) %8
 		 etirer(facteur:2.0 g4) %9
 		]
 
