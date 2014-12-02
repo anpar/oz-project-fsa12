@@ -1,7 +1,7 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    
@@ -198,6 +198,7 @@ local Mix Interprete Projet CWD in
       % ===============
       % INPUT : une hauteur (entier)
       % OUTPUT : une note (atom)
+      declare
       fun {HauteurToNote Hauteur}
 	 local Octave DeltaNote in
 	    if Hauteur < 0 then
@@ -723,6 +724,7 @@ local Mix Interprete Projet CWD in
    % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
    in
       {Browse begin}
-      {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
+      {Browse {Interprete Part8}}
+%{Browse {Projet.run Mix Interprete [Part7] CWD#'out.wav'}}
    end
 end
