@@ -1,7 +1,7 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    
@@ -47,7 +47,7 @@ local Mix Interprete Projet CWD in
 		  [] fondu_enchaine(duree:S M1 M2) then NewAV = {FonduEnchaine S {MixMusic M1} {MixMusic M2}}
 		  [] couper(debut:S1 fin:S2 M) then  NewAV = {Couper S1 S2 {MixMusic M}}
 		  else 
-		     NewAV = errormatching
+		     NewAV = errormatching % Est-ce qu'on laisse ça? On l'utilisait surtout pour debugger.
 		  end
 		  {MixMusicAux T {Append [NewAV] AudioVectorAcc}}
 	       end   
@@ -90,7 +90,6 @@ local Mix Interprete Projet CWD in
 			%F2 = {Reverse F1}
 			%{MixVoiceAux T {Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}|AudioVectorAcc}
 			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D File} D*44100.0}] AudioVectorAcc}}
-			
 		     end
 		  end
 	       end
@@ -111,7 +110,7 @@ local Mix Interprete Projet CWD in
 	    fun {FillAux Length AudioVectorAcc}
 	       if Length >= DesiredLength then {Lissage AudioVectorAcc DesiredLength}
 	       else
-		  {FillAux Length+1.0 {Append [{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVectorAcc}}
+		  {FillAux Length+1.0 {Append [0.5*{Sin (2.0*3.14159*F*Length)/44100.0}] AudioVectorAcc}}
 	       end
 	    end
 	    {FillAux 0.0 nil}
@@ -234,7 +233,6 @@ local Mix Interprete Projet CWD in
 	 end
       end
 
-     
       % +++++ Fonctions de filtre +++++
 
 
@@ -425,11 +423,6 @@ local Mix Interprete Projet CWD in
 	 
 	 {CouperAux AV BeginPlace nil}
       end
-
-      
-      
-      
-      
    in
       {MixMusic Music} 
    end
@@ -690,7 +683,7 @@ local Mix Interprete Projet CWD in
 				  alteration:none)
 	       end
 	    end
-	 end
+	 end	 
       in
 	 {InterpreteFlattened {Flatten Partition}}
       end 
