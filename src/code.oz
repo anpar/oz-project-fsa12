@@ -1,7 +1,7 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    
@@ -693,7 +693,7 @@ local Mix Interprete Projet CWD in
       Part2 = [silence c4 d4]
       Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
       Part4 = [duree(secondes:10.0 [a4 b4 c4])]
-      Part5 = [a4 b2 e1]
+      Part5 = [a4]
       Part6 = [instrument(nom:guitare [a4 b4 c4])]
       Part7 = [instrument(nom:guitare instrument(nom:piano a4))]
       Part8 = [instrument(nom:guitare [instrument(nom:piano a4) [e1 e2]])]
@@ -704,7 +704,7 @@ local Mix Interprete Projet CWD in
       Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
    % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
       Chat = wave(CWD#'wave/animaux/cat.wav')
-      M = partition([a])
+      M = [partition(Part5)]
       
    %Music = [repetition(nombre:3 [partition(Part2)])]
    %Joie = [partition([a b c])]
@@ -717,6 +717,6 @@ local Mix Interprete Projet CWD in
    in
       {Browse begin}
       %{Browse {Interprete Part8}}
-      {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
+      {Browse {Projet.run Mix Interprete M CWD#'out.wav'}}
    end
 end

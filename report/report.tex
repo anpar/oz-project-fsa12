@@ -1,5 +1,5 @@
 \documentclass[10pt,a4paper]{article}
-\usepackage[lutf8]{inputenc}
+\usepackage[latin1]{inputenc}
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -7,6 +7,16 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{subfig}
+\usepackage{natbib}
+\usepackage{layout}
+\usepackage{wrapfig}
+\usepackage{minitoc}
+%\usepackage{caption}
+%\usepackage{subcaption}
+
+
 \usepackage[top = 2.5 cm, bottom = 2.5 cm, left = 2.5 cm, right = 2.5 cm]{geometry}
 \usepackage{listings}
 
@@ -14,6 +24,7 @@
 \title{DJ'Oz : Rapport de projet}
 \date{4 décembre 2014}
 \begin{document}
+\sloppy
 \maketitle
 
 
@@ -124,6 +135,29 @@ utilisées.
 
 
 \section{Extensions}
+
+Nous avons créé deux extensions: la possibilité d'utiliser un instrument et une fonction de lissage de notes.
+
+\subsection{Instrument}
+
+
+
+
+\subsection{Lissage}
+
+
+Cette fonction permet de supprimer les bruits désagréables entre chaque note en adoucissant le début et la fin de ces dernières. Pour ce faire, nous avons modélisé une enveloppe sonore du type ADSR ("Attack - Decay - Sustain - Release"). Cette enveloppe commence par une zone de croissance (Attack) jusqu'à un maximum, puis diminue (Decay) pour atteindre une zone stable (Sustain) et finalement la fin de la note (Release). Notre fonction Lissage permet de modifier chacun des paramètres qui constituent la courbe ADSR (Durée Attack, Hauteur Attack, Durée Decay, Hauteur Sustain, Durée Sustain, Durée Release).
+
+\begin{figure}[h!]
+    \begin{minipage}[b]{0.4\linewidth}
+        \centering \includegraphics[height=6cm]{images/ADSR.png}
+        \caption{Enveloppe sonore ADSR.}
+    \end{minipage}\hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering \includegraphics[height=6cm]{images/OurADSR.jpg}
+        \caption{Affichage d'un de nos fichiers wave contenant une note.}
+    \end{minipage}
+\end{figure}
 
 
 
