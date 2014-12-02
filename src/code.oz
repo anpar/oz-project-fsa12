@@ -34,12 +34,14 @@ local Mix Interprete Projet CWD in
 		  [] repetition(duree:D M) then NewAV = {RepetitionDuree D {MixMusic M}}
 		  [] clip(bas:Bas haut:Haut M) then NewAV = {Clip Bas Haut {MixMusic M}}
 		  [] echo(delai:S M) then NewAV = {Merge [0.5#M 0.5#{Flatten [voix([silence(duree:S)]) M]}]}
+		     % A remplacer par NewAV = {Merge {Echo S 1.0 2 M}}
 		  [] echo(delai:S decadence:D M) then
 		     local I1 I2 in
 			I2 = 1.0/(1.0/D + 1.0)
 			I1 = I2/D
 			NewAV = {Merge [I1#M I2#{Flatten [voix([silence(duree:S)]) M]}]}
 		     end
+		     % A remplacer par NewAV = {Merge {Echo S D 2 M}}
 		  [] echo(delai:S decadence:D repetition:N M) then NewAV = {Merge {Echo S D N M}}
 		  [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = {Fondu S1 S2 {MixMusic M}}
 		  [] fondu_enchaine(duree:S M1 M2) then NewAV = {FonduEnchaine S {MixMusic M1} {MixMusic M2}}
