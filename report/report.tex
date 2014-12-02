@@ -1,5 +1,5 @@
 \documentclass[12pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
+\usepackage[lutf8]{inputenc}
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -23,12 +23,11 @@
 Nous avons divisé, comme demandé, le programme en trois parties:
 \begin{itemize}
 	\item Une fonction Interprete, qui prends une partition en 	paramètre et qui renvoie une liste d'échantillons;
-	\item une fonction Mix, qui prend (1) une fonction qui permet d'interpréter une partition  et (2) 
-				une musique et qui renvoie un vecteur audio, sous la forme d'une liste de flottants compris dans l'intervalle [-1.0;1.0];
-	\item un fichier brabanconne.dj.oz, qui contient une musique.
+	\item une fonction Mix, qui prend (1) une fonction qui permet d'interpréter une partition  et (2) une musique et qui renvoie un vecteur audio, sous la forme d'une liste de flottants compris dans l'intervalle [-1.0;1.0];
+	\item un fichier example.dj.oz, qui contient une musique.
 \end{itemize}
 
-Les deux fonctions que nous avons créées sont écrites entièrement en programmation déclarative. Par ailleurs, nous avons essayé de rendre toutes nos sous-fonctions récursives terminales.
+Les deux fonctions que nous avons créées sont écrites entièrement en programmation déclarative. Par ailleurs, nous avons rendu toutes nos sous-fonctions récursives terminales.
 
 \subsection{Fonction Interprete}
 \subsubsection{Sous-fonction principale}
@@ -144,7 +143,13 @@ Il y a autant de sous-fonction de filtre qu'il y a de filtres possibles (sauf po
 	\end{table}
 
 \section{Décisions prises}
-% TODO
+
+\paragraph{Programmation déclarative} Comme dit ci-dessus, aucune structure non-déclarative n'a été nécessaire pour écrire notre proramme.
+
+\paragraph{Récursion terminale}
+
+
+
 \section{Extensions}
 % TODO
 \section{Pistes d'améliorations}
