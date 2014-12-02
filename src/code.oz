@@ -699,6 +699,8 @@ local Mix Interprete Projet CWD in
    % +++++++++++++++++++++++++++++
    local 
       Joie = {Projet.load CWD#'joie.dj.oz'}
+      Brabanconne = {Projet.load CWD#'example.dj.oz'}
+
       Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
       Part2 = [silence c4 d4]
       Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
@@ -726,6 +728,6 @@ local Mix Interprete Projet CWD in
    % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
    in
       {Browse begin}
-      {Browse {Projet.run Mix Interprete Joie CWD#'out.wav'}}
+      {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
    end
 end
