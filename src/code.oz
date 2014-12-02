@@ -307,8 +307,10 @@ local Mix Interprete Projet CWD in
 	    fun {EchoAux N I Acc}
 	       if N==~1 then Acc
 	       elseif N==0 then
+		  {Browse I}
 		  {EchoAux N-1 I/D {Append [I#M] Acc}}
 	       else
+		  {Browse I}
 		  {EchoAux N-1 I/D {Append [I#{Flatten [voix([silence(duree:S*{IntToFloat N})]) M]}] Acc}}
 	       end
 	    end
