@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 \usepackage[lutf8]{inputenc}
 \usepackage[french]{babel}
 \usepackage[T1]{fontenc}
@@ -51,15 +51,13 @@ Mix 	& MixMusic &  MixVoice, Merge, RepetitionNB, Echo, ... &  Fill, Combine, ..
 \paragraph{Récursion terminale}
 Pour rendre notre code plus rapide, nous nous sommes arrangés pour que toutes nos sous-fonctions
  soient récursives terminales. Pour ce faire, nous avons, notamment, utilisé des accumulateurs.
+ 
+ \paragraph{Privilégier autant que possible l'appel à des fonctions déjà créées} Une des grandes difficultés de ce projet était l'"encapsulation" de données dans d'autres données. Par exemple, une musique peut contenir un filtre qui contient un filtre qui contient un merge qui contient une musique qui contient une partition qui contient une transformation, ... Pour pouvoir faire sortir progressivement tout ces niveaux de données, nous avons dû systématiquement, dans chaque sous-fonction secondaire, ré-appeler la fonction maitresse.
 
 \paragraph{Astuce lors des récursions}
-A de nombreux endroits du code, nous devions construire progressivement une liste 
-(en utilisant la récursion terminale). Une technique consiste à utiliser la fonction
-\{Append Accumulateur NouvelElement\}. Le problème est que Append va d'abord parcourir
-l'accumulateur en entier avant "d'ajouter" le nouvel élément... Or, très souvent, l'accumulateur est très grand (en particulier si la musique à mixer est grande) et le nouvel élément très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer notre code, nous avons donc inversé les arguments dans le Append, et à la fin de la fonction, nous renvoyons \{Reverse Acc\}. Ceci permet de ne parcourir qu'une seule fois 
-la liste en entier, et donc de réduire la complexité.
+A de nombreux endroits du code, nous devions construire progressivement une liste. Une technique (lorsque l'on utilise un accumulateur) consiste à utiliser la fonction \{Append Accumulateur NouvelElement\}. Le problème est que Append va d'abord parcourir l'accumulateur en entier avant "d'ajouter" le nouvel élément... Or, très souvent, l'accumulateur est très grand (en particulier si la musique à mixer est grande) et le nouvel élément très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer notre code, nous avons donc inversé les arguments: \{Append NouvelElement Accumulateur\}, et à la fin de la fonction, nous renvoyons \{Reverse Accumulateur\}. Ceci permet de ne parcourir qu'une seule fois l'accumulateur en entier, et donc de réduire la complexité temporelle de la fonction de O(n!) à O(n). Cette technique s'est avérée particulièrement efficace lorsque nous devions construire un vecteur audio d'une certaine fréquence (fonction Fill), dont la longueur moyenne est de 44 100 éléments (1 seconde)
 
-\paragraph{Astuce lors de Reverse}
+\paragraph{Astuce lors de Reverse} Cependant, l'astuce précédente, bien qu'elle permettre d'accélérer grandement nos fonctions, a amené un autre problème: si NouvelElement est une liste, alors non seulement les éléments ne seront plus dans l'ordre, mais en plus il sera impossible de les reclasser dans le bon ordre en appelant \{Reverse\}.
 
 
 
