@@ -1,7 +1,7 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
    
@@ -33,15 +33,8 @@ local Mix Interprete Projet CWD in
 		  [] repetition(nombre:N M) then NewAV = {RepetitionNB N {MixMusic M}}
 		  [] repetition(duree:D M) then NewAV = {RepetitionDuree D {MixMusic M}}
 		  [] clip(bas:Bas haut:Haut M) then NewAV = {Clip Bas Haut {MixMusic M}}
-		  [] echo(delai:S M) then NewAV = {Merge [0.5#M 0.5#{Flatten [voix([silence(duree:S)]) M]}]}
-		     % A remplacer par NewAV = {Merge {Echo S 1.0 1 M}}
-		  [] echo(delai:S decadence:D M) then
-		     local I1 I2 in
-			I2 = 1.0/(1.0/D + 1.0)
-			I1 = I2/D
-			NewAV = {Merge [I1#M I2#{Flatten [voix([silence(duree:S)]) M]}]}
-		     end
-		     % A remplacer par NewAV = {Merge {Echo S D 2 M}}
+		  [] echo(delai:S M) then NewAV = {Merge {Echo S 1.0 1 M}}
+		  [] echo(delai:S decadence:D M) then NewAV = {Merge {Echo S D 1 M}}
 		  [] echo(delai:S decadence:D repetition:N M) then NewAV = {Merge {Echo S D N M}}
 		  [] fondu(ouverture:S1 fermeture:S2 M) then NewAV = {Fondu S1 S2 {MixMusic M}}
 		  [] fondu_enchaine(duree:S M1 M2) then NewAV = {FonduEnchaine S {MixMusic M1} {MixMusic M2}}
@@ -198,7 +191,6 @@ local Mix Interprete Projet CWD in
       % ===============
       % INPUT : une hauteur (entier)
       % OUTPUT : une note (atom)
-      declare
       fun {HauteurToNote Hauteur}
 	 local Octave DeltaNote in
 	    if Hauteur < 0 then
@@ -712,7 +704,7 @@ local Mix Interprete Projet CWD in
       Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
    % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
       Chat = wave(CWD#'wave/animaux/cat.wav')
-      M = partition([a b c])
+      M = partition([a])
       
    %Music = [repetition(nombre:3 [partition(Part2)])]
    %Joie = [partition([a b c])]
@@ -724,7 +716,7 @@ local Mix Interprete Projet CWD in
    % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
    in
       {Browse begin}
-      {Browse {Interprete Part8}}
-%{Browse {Projet.run Mix Interprete [Part7] CWD#'out.wav'}}
+      %{Browse {Interprete Part8}}
+      {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
    end
 end
