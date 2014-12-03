@@ -81,7 +81,7 @@ local Mix Interprete Projet CWD in
 			%F1 = {Couper 0.001 0.021 File}
 			%F2 = {Reverse F1}
 			%{MixVoiceAux T {Lissage {RepetitionDuree D {Append F1 F2}} D*44100.0}|AudioVectorAcc}
-			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D File} D*44100.0}] AudioVectorAcc}}
+			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Couper 0.0 D File}} D*44100.0}] AudioVectorAcc}}
 		     end
 		  end
 	       end

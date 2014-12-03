@@ -22,5 +22,5 @@ local
    Partition = [echo(delai:1.0 decadence:0.5 repetition:4 etirer(facteur:0.2 [Tune End1 Tune End2 Interlude Tune End2]))]
 in
    % Ceci est une musique :-)
-   [echo(delai:1.0 decadence:0.5 repetition:4 [partition([etirer(facteur:0.5 MainDroite)])])]
+   [echo(delai:1.0 decadence:0.5 repetition:4 [partition(instrument(nom:bee_long [etirer(facteur:0.5 MainDroite)]))])]
 end
