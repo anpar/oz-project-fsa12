@@ -77,7 +77,7 @@ local
 in
    % Ceci est une musique :-)
    %[echo(delai:1.0 decadence:0.3 repetition:4 [[etirer(facteur:0.5 MainDroite)]))])]
-   %[merge([0.35#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a2  MainGauche1))))] 0.55#[partition(etirer(facteur:0.5 MainDroite))]   0.1#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a3  MainGauche2))))]  ])]
-   [merge([0.5#[partition(etirer(facteur:0.5 BellsDroite))] 0.5#[partition(instrument(nom:bassdist  etirer(facteur:0.5 BellsGauche)))] ])]
+   [merge([0.35#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a2  MainGauche1))))] 0.55#[partition(etirer(facteur:0.5 MainDroite))]   0.1#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a3  MainGauche2))))]  ])]
+   %[merge([0.5#[partition(etirer(facteur:0.5 BellsDroite))] 0.5#[partition(instrument(nom:bassdist  etirer(facteur:0.5 BellsGauche)))] ])]
 
 end

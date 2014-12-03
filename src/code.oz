@@ -3,7 +3,7 @@ local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
    CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
-
+   
    % +++++++++++++++++++++++++++++++++++++++++
    % +                MIX                    +
    % +++++++++++++++++++++++++++++++++++++++++
@@ -71,7 +71,8 @@ local Mix Interprete Projet CWD in
 			{MixVoiceAux T {Append [{Fill F D}] AudioVectorAcc}}
 		     [] echantillon(duree:D hauteur:Ht instrument:I) then
 			Note = {HauteurToNote Ht}
-			{Browse CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			% C'est ici que l'erreur survient parfois s'il n'y pas de note correspondant a l'instrument choisi
+			% ou si l'instrument n'existe carrement pas? On fait quoi? Un try-catch?
 			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
 			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Couper 0.0 D File}} D*44100.0}] AudioVectorAcc}}
 		     end
@@ -678,8 +679,11 @@ local Mix Interprete Projet CWD in
    % +++++++++++++++++++++++++++++
    local 
       Brabanconne = {Projet.load CWD#'example.dj.oz'}
+      TimeBegin
    in
-      {Browse begin}
+      {Browse {VirtualString.toAtom "We are creating your music..."}}
+      TimeBegin = {Time.time}
       {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
+      {Browse {VirtualString.toAtom "Execution time : "#{Time.time}-TimeBegin#"s."}}
    end
 end
