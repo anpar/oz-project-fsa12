@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section.1}{Structure\040du\040programme}{}% 1
+\BOOKMARK [1][-]{section.2}{Décisions prises et astuces de programmation}{}% 2
+\BOOKMARK [1][-]{section.3}{Complexité calculatoire}{}% 3
+\BOOKMARK [1][-]{section.4}{Extensions}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Instrument}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Lissage}{section.4}% 6
+\BOOKMARK [1][-]{section.5}{Limitations du programme et difficultés perçues}{}% 7
+\BOOKMARK [2][-]{subsection.5.1}{Limitations\040du\040programme}{section.5}% 8
+\BOOKMARK [2][-]{subsection.5.2}{Fonction\040Interprete}{section.5}% 9
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Sous-fonction\040principale}{subsection.5.2}% 10
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Sous-fonctions\040de\040transformation}{subsection.5.2}% 11
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Sous-fonctions complémentaires}{subsection.5.2}% 12
+\BOOKMARK [2][-]{subsection.5.3}{Fonction\040Mix}{section.5}% 13
+\BOOKMARK [3][-]{subsubsection.5.3.1}{Sous-fonction\040principale}{subsection.5.3}% 14
+\BOOKMARK [3][-]{subsubsection.5.3.2}{Sous-fonctions de création de vecteur audio \(cas simples\)}{subsection.5.3}% 15
+\BOOKMARK [3][-]{subsubsection.5.3.3}{Sous-fonctions\040de\040filtre\040et\040merge\040\(cas\040complexes\)}{subsection.5.3}% 16

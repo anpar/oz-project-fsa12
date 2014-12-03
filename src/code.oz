@@ -717,6 +717,6 @@ local Mix Interprete Projet CWD in
    in
       {Browse begin}
       %{Browse {Interprete Part8}}
-      {Browse {Projet.run Mix Interprete M CWD#'out.wav'}}
+      {Browse {Projet.run Mix Interprete Brabanconne CWD#'out.wav'}}
    end
 end

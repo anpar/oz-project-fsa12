@@ -13,6 +13,7 @@
 \usepackage{layout}
 \usepackage{wrapfig}
 \usepackage{minitoc}
+\usepackage{url}
 %\usepackage{caption}
 %\usepackage{subcaption}
 
@@ -20,29 +21,31 @@
 \usepackage[top = 2.5 cm, bottom = 2.5 cm, left = 2.5 cm, right = 2.5 cm]{geometry}
 \usepackage{listings}
 
-\author{Philippe Verbist  Antoine Paris\\3521-13-00 \ \ \ \ 3158-13-00}
-\title{DJ'Oz : Rapport de projet}
-\date{4 décembre 2014}
+\author{Philippe Verbist - Antoine Paris \\ \ \ \ 3521-13-00\ \ \ \ \ \ 3158-13-00}
+\title{\textbf{Rapport du projet DJ'Oz}}
+\date{Le 4 décembre 2014}
 \begin{document}
 \sloppy
 \maketitle
 
 
 \section{Structure du programme}
-Nous avons divisé, comme demandé, le programme en trois parties:
+Comme il nous l'a été demandé, nous avons divisé notre programme en trois parties:
 \begin{itemize}
-	\item Une fonction Interprete, qui prends une partition en 	paramètre et qui renvoie une liste d'échantillons;
-	\item une fonction Mix, qui prend (1) une fonction qui permet d'interpréter une partition  et (2) une musique et qui renvoie un vecteur audio, sous la forme d'une liste de flottants compris dans l'intervalle [-1.0;1.0];
+	\item une fonction Interprete, qui prend une partition en paramètre et  renvoie une liste d'échantillons;
+	\item une fonction Mix, qui 1) prend en paramètre une fonction qui permet d'interpréter une partition  et une musique et qui  2) renvoie un vecteur audio, sous la forme d'une liste de flottants compris dans l'intervalle [-1.0;1.0];
 	\item un fichier example.dj.oz, qui contient une musique.
 \end{itemize}
+\vspace{0.5 cm}
 
+Le tableau suivant reprend de manière synthétique la structure de nos deux fonctions.
 
 
 	\begin{table}[ht!]
 		\centering
 			\begin{tabular}{|p{0.15\textwidth}|p{0.22\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|}
 			\hline
-			\textbf{Fonction}		& \textbf{Sous-fonction maitresse}& \textbf{Sous-fonctions principales} & \textbf{Autres sous-fonctions}	\\
+			\textbf{Fonction}		& \textbf{Sous-fonction maîtresse}& \textbf{Sous-fonctions principales} & \textbf{Autres sous-fonctions}	\\
 			\hline
 Interprete		&InterpreteFlattened	& DureeTrans, Etirer, Bourdon, Transpose, Instrument, ... & ToNote, NumberOfSemiTones, ...\\
 			\hline
@@ -52,28 +55,26 @@ Mix 	& MixMusic &  MixVoice, Merge, RepetitionNB, Echo, ... &  Fill, Combine, ..
 
 			\hline
 			\end{tabular}
-		\caption{Résumé des fonctions de notre programme.}
+		\caption{Résumé des fonctions de notre programme}
 	\end{table}
 
 
-\section{Décisions prises et astuces de programmation}
-\paragraph{Programmation déclarative} Aucune structure non-déclarative n'a été nécessaire pour écrire notre programme. Nous n'en avons donc pas utilisé.
+\section{Décisions de conception et astuces de programmation}
+\paragraph{Programmation déclarative:} aucune structure non-déclarative ne s'est avérée nécessaire pour écrire notre programme; nous n'en avons donc pas utilisé.
 
-\paragraph{Récursion terminale}
-Pour rendre notre code plus rapide, nous nous sommes arrangés pour que toutes nos sous-fonctions
- soient récursives terminales. Pour ce faire, nous avons, notamment, utilisé des accumulateurs.
+\paragraph{Récursion terminale:} afin de rendre notre code plus rapide, nous avons fait en sorte que toutes nos sous-fonctions soient récursives terminales. Pour ce faire, nous avons, notamment, utilisé des accumulateurs.
  
- \paragraph{Privilégier autant que possible l'appel de fonctions déjà créées} Une des grandes difficultés de ce projet était l'"encapsulation" de données dans d'autres données. Par exemple, une musique peut contenir un filtre qui contient un filtre qui contient un merge qui contient une musique qui contient une partition qui contient une transformation, ... Pour pouvoir faire sortir progressivement tout ces niveaux de données, nous avons dû systématiquement, dans chaque sous-fonction secondaire, ré-appeler la fonction maitresse.
+ \paragraph{Privilégier autant que possible l'appel de fonctions déjà créées:} une des grandes difficultés du projet a été l'"encapsulation" de données dans d'autres données. Par exemple, une musique peut contenir un filtre, qui contient un filtre, qui contient un merge, qui contient une musique, qui contient une partition, qui contient une transformation, ... Pour pouvoir faire sortir progressivement tout ces différents niveaux de données, nous avons systématiquement ré-appelé la fonction maîtresse dans chaque sous-fonction secondaire.
 
-\paragraph{Astuce lors des récursions}
-A de nombreux endroits du code, nous devions construire progressivement une liste. Une technique (lorsque l'on utilise un accumulateur) consiste à utiliser la fonction \{Append Accumulateur NouvelElement\}. Le problème est que Append va d'abord parcourir l'accumulateur en entier avant "d'ajouter" le nouvel élément... Or, très souvent, l'accumulateur est très grand (en particulier si la musique à mixer est grande) et le nouvel élément très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer notre code, nous avons donc inversé les arguments: \{Append NouvelElement Accumulateur\}, et à la fin de la fonction, nous renvoyons \{Reverse Accumulateur\}. Ceci permet de ne parcourir qu'une seule fois l'accumulateur en entier, et donc de réduire la complexité temporelle de la fonction de O(n!) à O(n). Cette technique s'est avérée particulièrement efficace lorsque nous devions construire un vecteur audio d'une certaine fréquence (fonction Fill), dont la longueur moyenne est de 44 100 éléments (1 seconde)
+\paragraph{Astuce lors des récursions:}
+à de nombreux endroits du code, nous avons dû construire progressivement une liste. Lorsque l'on utilise un accumulateur, une technique  consiste à utiliser la fonction \{Append Accumulateur NouvelElement\}. La difficulté est que Append  parcourt tout l'accumulateur avant "d'ajouter" le nouvel élément. Or, très souvent, l'accumulateur est très grand - en particulier si la musique à mixer est grande - et le nouvel élément, très petit (il s'agit, très souvent, d'un seul élément). Pour accélérer notre code, nous inversons donc les arguments: \{Append NouvelElement Accumulateur\}, et à la fin de la fonction, nous renvoyons \{Reverse Accumulateur\}. Ceci permet de ne parcourir qu'une seule fois l'accumulateur en entier, et donc de réduire la complexité temporelle de la fonction de O(n!) à O(n). Cette technique s'est avérée particulièrement efficace lorsque nous devions construire un vecteur audio d'une certaine fréquence (fonction Fill), dont la longueur moyenne est de 44 100 éléments (ce qui correspond à 1 seconde).
 
-\paragraph{Astuce lors de Reverse} Cependant, l'astuce précédente, bien qu'elle permettre d'accélérer grandement nos fonctions, a amené un autre problème: si NouvelElement est une liste, alors non seulement les éléments ne seront plus dans l'ordre, mais en plus il sera impossible de les reclasser dans le bon ordre en appelant \{Reverse Acc\}. Pour corriger ce problème, nous créons une liste de listes (voir Figure \ref{fig:astuceReverse}), et on renvoie la liste en utilisant \{Flatten \{Reverse Acc\}\}.
+\paragraph{Astuce lors de Reverse:} l'astuce précédente, bien qu'elle permet d'accélérer grandement nos fonctions, a amené un problème: si NouvelElement est une liste, alors non seulement les éléments ne seront plus dans l'ordre, mais en plus il sera impossible de les reclasser dans le bon ordre en appelant \{Reverse Acc\}. Pour corriger ce problème, nous avons  créé une liste de listes (voir Figure \ref{fig:astuceReverse}), et, ensuite, renvoyé la liste \{Flatten \{Reverse Acc\}\}.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=10cm]{images/AstuceAppend.png}
-\caption{A gauche: une liste impossible à reclasser dans le bon ordre. A droite: une liste de listes qu'il est possible de reclasser dans le bon ordre en appelant Reverse.}
+\caption{A gauche: une liste qu'il est impossible de reclasser dans le bon ordre. A droite: une liste de listes qu'il est possible de reclasser dans le bon ordre en appelant Reverse.}
 \label{fig:astuceReverse}
 \end{figure}
 
@@ -130,44 +131,61 @@ utilisées.
 			NumberToNote																			& $1$ 														& $1$ \\
 			\hline
 			\end{tabular}
-		\caption{Analyse de la complexité calculatoire de nos fonctions.}
+		\caption{Analyse de la complexité calculatoire de nos fonctions}
 	\end{table}
 
 
 \section{Extensions}
 
-Nous avons créé deux extensions: la possibilité d'utiliser un instrument et une fonction de lissage de notes.
+Nous avons créé deux extensions: la possibilité d'utiliser un instrument, d'une part, et une fonction de lissage de notes, d'autre part.
 
 \subsection{Instrument}
 
-
-
+Cette extension permet de mettre à profit le champ instrument: des échantillons. Pour ce faire, nous avons, comme suggéré dans les consignes, étendu la grammaire des transformations des partitions avec la transformation instrument(nom:). 
+Ainsi, si le champ instrument: d'un échantillon n'est pas none, un fichier audio est chargé et est répété aussi longtemps que désiré, grâce à notre sous-fonction \{RepetitionDuree Duree VecteurAudio\}. 
 
 \subsection{Lissage}
 
 
-Cette fonction permet de supprimer les bruits désagréables entre chaque note en adoucissant le début et la fin de ces dernières. Pour ce faire, nous avons modélisé une enveloppe sonore du type ADSR ("Attack - Decay - Sustain - Release"). Cette enveloppe commence par une zone de croissance (Attack) jusqu'à un maximum, puis diminue (Decay) pour atteindre une zone stable (Sustain) et finalement la fin de la note (Release). Notre fonction Lissage permet de modifier chacun des paramètres qui constituent la courbe ADSR (Durée Attack, Hauteur Attack, Durée Decay, Hauteur Sustain, Durée Sustain, Durée Release).
+Cette fonction permet de supprimer les bruits désagréables entre chaque note en adoucissant le début et la fin de ces dernières. Pour ce faire, nous avons modélisé une enveloppe sonore du type ADSR ("Attack - Decay - Sustain - Release")\footnote{Source: \url{http://fr.wikipedia.org/wiki/Enveloppe_sonore}}. Cette enveloppe commence par une zone de croissance (Attack) jusqu'à un maximum, puis diminue (Decay) pour atteindre une zone stable (Sustain) et finalement la fin de la note (Release). Les différents paramètres de la courbe que nous avons introduits sont, pour une note d'une durée d'une seconde: 
+\begin{itemize}
+\item Attack: durée de 0.1 s, passage d'une amplitude de 0 à 100\%;
+\item Decay: durée de 0.05 s, passage d'une amplitude de 100 à 90\%;
+\item Sustain: durée de 0.7 s;
+\item Release: durée de 0.15 s, passage d'une amplitude de 90 à 0\%.
+\end{itemize}
+
+Les paramètres de durée s'ajustent automatiquement en fonction de la durée de la note. Par ailleurs, chacun de ces paramètres peut être aisément modifié. 
+
+Cette transformation est appliquée par défaut à tous les vecteurs audio synthétisés à partir d'un échantillon ou d'un instrument.
 
 \begin{figure}[h!]
     \begin{minipage}[b]{0.4\linewidth}
         \centering \includegraphics[height=6cm]{images/ADSR.png}
-        \caption{Enveloppe sonore ADSR.}
+        \caption{Enveloppe sonore ADSR: modèle théorique}
     \end{minipage}\hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering \includegraphics[height=6cm]{images/OurADSR.jpg}
-        \caption{Affichage d'un de nos fichiers wave contenant une note.}
+        \caption{Affichage d'un de nos fichiers wave contenant une note lissée}
     \end{minipage}
 \end{figure}
 
 
 
-\section{Pistes d'améliorations}
-% TODO : gestion des erreurs
+\section{Limitation du programme et difficultés perçues}
 
+\subsection{Limitation du programme}
+
+Le programme, bien qu'il fonctionne bien dans l'ensemble, pourrait être amélioré au niveau de la fonction Instrument. En effet, lorsque le fichier audio est trop court, ce dernier est simplement répété, ce qui peut laisser place à des effets assez étranges et non voulus, puisque les fichiers audios à notre disposition simulent des instruments qui produisent un son variable en fonction du temps. Une solution serait d'arriver à isoler une partie représentative des fichiers wav, et à ne reproduire que cette partie-là. Malheureusement, nous n'avons eu le temps que de réaliser de petites implémentations peut concluantes de cette méthode, et nous ne les avons pas présentées ici.
+Par ailleurs, un autre amélioration de notre programme serait la gestion des erreurs, puisque il arrive très souvent qu'une partition ou une musique soit mal écrite dans le fichier .dj.oz.
+
+\subsection{Difficultés rencontrées}
+\subsubsection{Durée de compilation}
+Le temps de compilation - parfois très long 
 
 \newpage
 
-
+% brouillons
 
 \subsection{Fonction Interprete}
 \subsubsection{Sous-fonction principale}
