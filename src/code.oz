@@ -1,10 +1,9 @@
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
-   %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
 
-   
    % +++++++++++++++++++++++++++++++++++++++++
    % +                MIX                    +
    % +++++++++++++++++++++++++++++++++++++++++
@@ -63,7 +62,7 @@ local Mix Interprete Projet CWD in
 	    fun {MixVoiceAux V AudioVectorAcc}
 	       case V of nil then {Flatten {Reverse AudioVectorAcc}}
 	       [] H|T then
-		  local F Note File F1 F2 in
+		  local F Note File in
 		     case H of silence(duree:D) then
 			F = 0.0
 			{MixVoiceAux T {Append [{Fill F D}] AudioVectorAcc}}
@@ -576,7 +575,7 @@ local Mix Interprete Projet CWD in
          % l'instrument sera mis a I, si les echantillons n'ont pas
 	 % encore d'instrument
 	 fun {Instrument InstrumentAtom Part}
-	    local Echantillon InstrumentAux in
+	    local InstrumentAux in
 	       fun {InstrumentAux Voice Acc}
 		  case Voice of nil then {Reverse Acc}
 		  [] H|T then
@@ -686,34 +685,34 @@ local Mix Interprete Projet CWD in
    % +        TEST ZONE          +
    % +++++++++++++++++++++++++++++
    local 
-      Joie = {Projet.load CWD#'joie.dj.oz'}
+      %Joie = {Projet.load CWD#'joie.dj.oz'}
       Brabanconne = {Projet.load CWD#'example.dj.oz'}
 
-      Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
-      Part2 = [silence c4 d4]
-      Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
-      Part4 = [duree(secondes:10.0 [a4 b4 c4])]
-      Part5 = [a4]
-      Part6 = [instrument(nom:guitare [a4 b4 c4])]
-      Part7 = [instrument(nom:guitare instrument(nom:piano a4))]
-      Part8 = [instrument(nom:guitare [instrument(nom:piano a4) [e1 e2]])]
-      Part9 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute a4)])])]
-      Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
-      Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
-      Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
-      Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
-   % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
-      Chat = wave(CWD#'wave/animaux/cat.wav')
-      M = [partition(Part5)]
+      %Part1 = [etirer(facteur:0.5 [a4 b4 c4 d4 e4 f4])]
+      %Part2 = [silence c4 d4]
+      %Part3 = [a muet([a]) duree(secondes:0.77 [a b])]
+      %Part4 = [duree(secondes:10.0 [a4 b4 c4])]
+      %Part5 = [a4]
+      %Part6 = [instrument(nom:guitare [a4 b4 c4])]
+      %Part7 = [instrument(nom:guitare instrument(nom:piano a4))]
+      %Part8 = [instrument(nom:guitare [instrument(nom:piano a4) [e1 e2]])]
+      %Part9 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute a4)])])]
+      %Part10 = [instrument(nom:guitare [instrument(nom:piano [instrument(nom:flute duree(secondes:2.0 a4))]) e1]) c4 e3]
+      %Part11 = [instrument(nom:piano duree(secondes:2.0 a4))]
+      %Part12 = [instrument(nom:bziaou etirer(facteur:3.0 [a4 b4 c4 d4 e4 g4 f4]))]
+      %Tune = [partition([instrument(nom:'bee_long' [a5 b5 c5 d5 e5 f5 c5 b a b])])]
+      % Attention, si l'instrument commence avec un chiffre (exemple '8bit_stab') il faut le placer entre ''
+      %Chat = wave(CWD#'wave/animaux/cat.wav')
+      %M = [partition(Part5)]
       
-   %Music = [repetition(nombre:3 [partition(Part2)])]
-   %Joie = [partition([a b c])]
-   %Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
-   %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
-   %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
-      Music = Joie
-   % Remarque : appliquer un instrument à Joie en entier semble prendre beaucoup trop de temps (ou ne pas fonctionner)
-   % EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
+      %Music = [repetition(nombre:3 [partition(Part2)])]
+      %Joie = [partition([a b c])]
+      %Music = [couper(debut:1.0 fin:1.0 [echo(delai:1.0 decadence:0.75 repetition:10 [partition([a])])])]
+      %Music = [fondu(ouverture:2.0 fermeture:2.0 [M])]
+      %Music = [partition([a]) partition([b b]) voix([silence(duree:1.0)])]
+      %Music = Joie
+      %Remarque : appliquer un instrument à Joie en entier semble prendre beaucoup trop de temps (ou ne pas fonctionner)
+      %EDIT : c'est probablement un probleme de lenteur puisque déjà pour Tune ce n'est pas tres rapide.
    in
       {Browse begin}
       %{Browse {Interprete Part8}}
