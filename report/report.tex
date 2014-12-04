@@ -27,6 +27,15 @@
 \sloppy
 \maketitle
 
+\paragraph{Remarque importante}
+Si la compilation prend trop de temps (environ 4 minutes), il existe une version
+\textit{sobre} de nos musiques (sans les instruments, ce qui diminue le temps
+de compilation à seulement 14 secondes). Pour charger cette version
+sobre, il suffit de remplacer la dernière ligne du fichier exemple.dj.oz
+par la ligne juste au dessus (qui normalement est en commentaire).
+Enfin, le fichier out.wav correspondant à la version original
+est inclus dans notre soumission.
+
 \section{Structure du programme}
 Comme il nous l'a été demandé, nous avons divisé notre programme en trois parties:
 \begin{itemize}
@@ -98,7 +107,7 @@ et, ensuite, renvoyé la liste \{Flatten \{Reverse Acc\}\}.
 \end{figure}
 
 \section{Complexité calculatoire}
-Comme nos fonctions peuvent Dans cette section, nous donnons les complexité calculatoire
+Dans cette section, nous donnons les complexité calculatoire
 propre de chaque fonction, c'est à dire sans tenir des sous-fonctions
 utilisées.
 
@@ -142,7 +151,7 @@ utilisées.
 		\hline
 		HauteurToNote																			& $\mathcal{O}(1)$ 														 \\
 		\hline
-		NumberToNote																			& $\mathcal{O}(n)$ 														 \\
+		NumberToNote																			& $\mathcal{O}(1)$ 														 \\
 		\hline
 		\end{tabular}
 \end{center}
@@ -194,6 +203,10 @@ Une amélioration de notre programme serait la gestion des erreurs,
 puisque il arrive très souvent qu'une partition ou une musique soit mal écrite dans le fichier .dj.oz.
 Il serait donc bien de retourner un message d'erreur expliquant que la partition est mal formatée 
 plutôt que de laisser le programme se planter.
+La seule erreur qui a été gérée est le cas où l'instrument n'existe pas (ou le cas où l'instrument
+existe mais pas la note correspondante. Par exemple, il n'existe pas de note $g2$ pour 
+l'instrument \textit{bassdist}). Dans ce cas nous retournons un message
+d'erreur et remplaçons la son de l'instrument par une note pure.
 
 \subsection{Difficultés rencontrées}
 \subsubsection{Durée de compilation}

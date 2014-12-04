@@ -71,9 +71,12 @@ local Mix Interprete Projet CWD in
 			{MixVoiceAux T {Append [{Fill F D}] AudioVectorAcc}}
 		     [] echantillon(duree:D hauteur:Ht instrument:I) then
 			Note = {HauteurToNote Ht}
-			% C'est ici que l'erreur survient parfois s'il n'y pas de note correspondant a l'instrument choisi
-			% ou si l'instrument n'existe carrement pas? On fait quoi? Un try-catch?
-			File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			try
+			   File = {Projet.readFile CWD#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			catch X then
+			   {Browse 'Could not find file:'#'wave/instruments/'#{VirtualString.toAtom I}#'_'#{VirtualString.toAtom Note}#'.wav'}
+			   File = [{Fill ({Pow 2.0 ({IntToFloat Ht}/12.0)} * 440.0) D}]
+			end
 			{MixVoiceAux T {Append [{Lissage {RepetitionDuree D {Couper 0.0 D File}} D*44100.0}] AudioVectorAcc}}
 		     end
 		  end
