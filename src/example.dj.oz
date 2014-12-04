@@ -67,8 +67,8 @@ local
    Brabanconne = [merge( [0.55#[partition(etirer(facteur:0.5 instrument(nom:voice BrabMainDroite)))]
 			  0.1#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a3  BrabMainGauche2))))]
 			  0.35#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a2  BrabMainGauche1))))]])]
-   JingleBels = [merge([0.5#[partition(etirer(facteur:0.5 instrument(nom:bassdist BellsDroite)))]
-			0.5#[partition([etirer(facteur:0.5 instrument(nom:bassdist transpose(demitons:0 BellsGauche)))] )]])]
+   JingleBels = [merge([0.5#[partition(etirer(facteur:0.5 instrument(nom:woody BellsDroite)))]
+			0.5#[partition([etirer(facteur:0.5 instrument(nom:woody transpose(demitons:0 BellsGauche)))] )]])]
 
    BrabanconneSobre = [merge( [0.55#[partition(etirer(facteur:0.5 BrabMainDroite))]
 			       0.1#[partition(etirer(facteur:0.5 bourdon(note:a3 BrabMainGauche2)))]
@@ -77,10 +77,6 @@ local
 			     0.5#[partition([etirer(facteur:0.5 transpose(demitons:0 BellsGauche))] )]])]
 
 in
-   % Ceci est une musique :-)
-   %[echo(delai:1.0 decadence:0.3 repetition:4 [[etirer(facteur:0.5 MainDroite)]))])]
-  % [merge([0.35#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a2  BrabMainGauche1))))] 0.55#[partition(etirer(facteur:0.5 BrabMainDroite))]   0.1#[partition(etirer(facteur:0.5 instrument(nom:'drums' bourdon(note:a3  BrabMainGauche2))))]  ])]
-  % [merge([0.5#[partition(etirer(facteur:0.5 instrument(nom:bassdist BellsDroite)))] 0.5#[partition([etirer(facteur:0.5 instrument(nom:bassdist transpose(demitons:0 BellsGauche)))] )]])]
-   {Append BrabanconneSobre JingleBelsSobre}
-
+   %{Append BrabanconneSobre JingleBelsSobre} % Pour avoir un résultat plus rapide, sans les instruments... mais ca donne moins bien :-(
+   {Append Brabanconne JingleBels} % Pour plus de rapidite, un fichier .wav correspondant a cette version est inclue dans le soumission
 end
