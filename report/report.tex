@@ -118,40 +118,56 @@ utilisées.
 		\hline
 		InterpreteFlattened																& $\mathcal{O}(n)$ 									\\
 		\hline
-		DureeTrans WantedDuration Part 										& $\mathcal{O}(n)$, taille de Part								\\
+		DureeTrans WantedDuration Part 				& $\mathcal{O}(n)$, taille de Part								\\
 		\hline 
-		Etirer Facteur Part																& $\mathcal{O}(n)$, taille de Part 						 	\\
+		Etirer Facteur Part										& $\mathcal{O}(n)$, taille de Part 						 	\\
 		\hline
-		Bourdon Note Part																	& $\mathcal{O}(n)$, taille de Part 						 	\\
+		Bourdon Note Part											& $\mathcal{O}(n)$, taille de Part 						 	\\
 		\hline
-		Transpose Demitons Part														& $\mathcal{O}(n)$, taille de Part 						 	\\
+		Transpose Demitons Part								& $\mathcal{O}(n)$, taille de Part 						 	\\
 		\hline
-		Instrument InstrumentAtom Part										& $\mathcal{O}(n)$, taille de Part								\\
+		Instrument InstrumentAtom Part				& $\mathcal{O}(n)$, taille de Part								\\
 		\hline
-		VoiceDuration ListEchantillon											& $\mathcal{O}(n)$, taille de ListEchantillon	 	\\
+		VoiceDuration ListEchantillon					& $\mathcal{O}(n)$, taille de ListEchantillon	 	\\
 		\hline
-		NumberOfSemiTones Note														& $\mathcal{O}(1)$ 														 	\\
+		NumberOfSemiTones Note								& $\mathcal{O}(1)$ 														 	\\
 		\hline
-		NameToNumber Name																	& $\mathcal{O}(1)$ 														 	\\
+		NameToNumber Name											& $\mathcal{O}(1)$ 														 	\\
 		\hline
-		ToNote Note																				& $\mathcal{O}(1)$ 															 \\ 
+		ToNote Note														& $\mathcal{O}(1)$ 															 \\ 
 		\hline
 		\hline
-		MixMusic Music																		& $\mathcal{O}(n)$, taille de Music						 \\
+		MixMusic Music												& $\mathcal{O}(n)$, taille de Music						 \\
 		\hline
-		MixVoice Voice																		& $\mathcal{O}(n)$, taille de Voice						 \\
+		MixVoice Voice												& $\mathcal{O}(n)$, taille de Voice						 \\
 		\hline
-		Fill F Duree																			& $\mathcal{O}(n)$, valeur de Duree						 \\
+		Fill F Duree													& $\mathcal{O}(n)$, valeur de Duree						 \\
 		\hline
-		Merge MusicsWithIntensity													& $\mathcal{O}(n)$, taille de MusicsWithIntensity	 \\
+		Merge MusicsWithIntensity							& $\mathcal{O}(n)$, taille de MusicsWithIntensity	 \\
 		\hline
-		Combine L1 L2																			& $\mathcal{O}(n)$, taille de la plus grande des listes	 \\
+		Combine L1 L2													& $\mathcal{O}(n)$, taille de la plus grande des listes	 \\
 		\hline
-		Lissage AV Duree																	& $\mathcal{O}(n)$, taille de AV								 \\
+		Lissage AV Duree											& $\mathcal{O}(n)$, taille de AV								 \\
 		\hline
-		HauteurToNote																			& $\mathcal{O}(1)$ 														 \\
+		HauteurToNote Hauteur									& $\mathcal{O}(1)$ 														 \\
 		\hline
-		NumberToNote																			& $\mathcal{O}(1)$ 														 \\
+		NumberToNote Number										& $\mathcal{O}(1)$ 														 \\
+		\hline
+		Repetition NB AV											& $\mathcal{O}(n)$, valeur de NB							 \\
+		\hline
+		RepetitionDuree Duree AV							& $\mathcal{O}(n)$, valeur de Duree										 \\
+		\hline
+		Clip Bas Haut OldAudioVector					& $\mathcal{O}(n)$, taille de OldAudioVector						 \\
+		\hline
+		Echo Delai Decadence Repetition Part	& $\mathcal{O}(n)$, nombre de répétitions							 \\
+		\hline
+		Sum Repetition Decadence							& $\mathcal{O}(n)$, nombre de répétitions						 \\
+		\hline
+		Fondu Ouverture Fermeture AV					& $\mathcal{O}(n)$, la taille de AV							 		\\
+		\hline
+		FonduEnchaine Duree AV1 AV2						& $\mathcal{O}(n)$,	la taille de AV1								 \\
+		\hline
+		Couper Begin End AV										& $\mathcal{O}(n)$, la taille de AV									 \\
 		\hline
 		\end{tabular}
 \end{center}
