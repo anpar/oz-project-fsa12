@@ -678,7 +678,7 @@ local Mix Interprete Projet CWD in
    % +        TEST ZONE          +
    % +++++++++++++++++++++++++++++
    local 
-      Brabanconne = {Projet.load CWD#'example.dj.oz'}
+      Brabanconne = {Projet.load CWD#'exemple.dj.oz'}
       TimeBegin
    in
       {Browse {VirtualString.toAtom "We are creating your music..."}}
