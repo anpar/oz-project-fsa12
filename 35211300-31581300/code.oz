@@ -4,8 +4,9 @@
 % =====================================
 local Mix Interprete Projet CWD in
    %CWD = {Property.condGet 'testcwd' 'C:/Users/Philippe/Documents/GitHub/oz-project-fsa12/src/'} % Windows Phil
-   CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
+   %CWD = {Property.condGet 'testcwd' '/Users/Philippe/Desktop/oz-project-fsa12/src/'} % Mac Phil
    %CWD = {Property.condGet 'testcwd' 'C:/git/oz-project-fsa12/src/'} % Windows Antoine
+   CWD = {Property.condGet 'testcwd' '/home/layus/ucl/fsab1402/2014-2015/projet_2014/src/'}
    [Projet] = {Link [CWD#'Projet2014_mozart2.ozf']}
    
    % +++++++++++++++++++++++++++++++++++++++++
@@ -686,7 +687,7 @@ local Mix Interprete Projet CWD in
    % +        TEST ZONE          +
    % +++++++++++++++++++++++++++++
    local 
-      Brabanconne = {Projet.load CWD#'example.dj.oz'}
+      Brabanconne = {Projet.load CWD#'exemple.dj.oz'}
       TimeBegin
    in
       {Browse {VirtualString.toAtom "We are creating your music..."}}
